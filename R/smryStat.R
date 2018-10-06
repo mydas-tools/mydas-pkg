@@ -1,0 +1,40 @@
+#Safety, is stock above PRI
+#Time to recovery to green quandrant and once  recovered does it stay there?
+#Discounted yield
+#AAV in yield
+
+avFn<-function(object){
+  
+  o1 =object[-length(object)]
+  o2 =object[-1]
+  
+  return(abs((o2-o1)/o1))}
+
+green<-function(flag,year){
+  flag=flag>=1
+  year=as.numeric(year)
+  
+  if (sum(flag)==0){
+    y=max(year)+1
+    p=0
+    n=0
+  }else{
+    y   =year[flag][1]
+    flag=flag[year>y]
+    n   =length(flag[flag])
+    p   =mean(flag)}
+  
+  return(data.frame(year=y,n=n,p=p))}
+
+udFn<-function(object){
+  
+  o1 =object[-1]
+  o2 =object[-length(object)]
+  
+  return(sum(o1<o2))/(length(object)-1)}
+
+smryStat<-function(dat,dr=0){
+  with(dat, data.frame(safety  =min(rec_hat/virgin_rec,na.rm=T),
+                       kobe    =green((ssb/msy_ssb>1)&(fbar/msy_harvest<1),year)[1:2],
+                       yield   =dRate(catch/msy_yield,dr)/length(catch),
+                       yieldAav=mean(avFn(pmax(catch,msy_yield*0.1)))))}
