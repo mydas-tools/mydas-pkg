@@ -1,0 +1,6 @@
+library(devtools)
+setwd("/home/laurence/Desktop/sea++/mydas/pkgs")
+create("mydas")
+current.code <- as.package("mydas")
+load_all(current.code)
+document(current.code)
