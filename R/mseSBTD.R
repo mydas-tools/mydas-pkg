@@ -17,7 +17,8 @@ mseSBTD<-function(
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Capacity, i.e. F in OM can not be greater than this
-  maxF=1.5){
+  maxF=1.5,
+  nyrs=3){
 
   ##So you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
@@ -31,7 +32,7 @@ mseSBTD<-function(
   maxF=median(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF)
 
   ## Observation Error (OEM) setup
-  cpue=window(stock(om),end=start)
+  cpue=window(ssb(om),end=start)
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
 
   ## Loop round years
@@ -42,18 +43,25 @@ mseSBTD<-function(
     ## Observation Error, using data from last year back to the last assessment
     ## CPUE
     cpue=window(cpue,end=iYr-1)
-    cpue[,ac(iYr-(interval:1))]=stock(om)[,ac(iYr-(interval:1))]%*%uDev[,ac(iYr-(interval:1))]
+    cpue[,ac(iYr-(interval:1))]=(ssb(om))[,ac(iYr-(interval:1))]%*%uDev[,ac(iYr-(interval:1))]
     
     #### Management Procedure
     ##Constant catch
     #tac=hcrConstantCatch(iYr+1,catch=catch(om)[,ac(iYr-(2:1))]) 
+    
     tac=hcrSBTD(iYr+seq(interval),
                 control=control,
-                cpue[,ac(ac(iYr-(3:1)))],
-                catch(om)[,ac(iYr-(2:1))])
+                cpue[,ac(iYr-(nyrs:1))],
+                catch(om)[,ac(iYr-(interval:1)+1)])
+    maxf=mean(maxF)
     
-    #### Operating Model update
+save(om,tac,eq,srDev,maxf,
+     file="/home/laurence/Desktop/tmp/om1.RData")
+
+    #### Operatin Model update
     om =fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(maxF))
+    
+save(om,file="/home/laurence/Desktop/tmp/om2.RData")
     
     print(plot(window(om,end=iYr+interval)))
     }

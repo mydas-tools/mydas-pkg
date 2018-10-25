@@ -1,14 +1,17 @@
 hcrSBTP<-function(yrs,
-                  control=c(k1=0.25,k2=0.25),
-                  catch,
-                  cpue,
+                  control=FLPar(c(k1=0.25,k2=0.25)),
                   ref,
-                  target){
+                  target,
+                  cpue,
+                  catch){
   
-  flag    =cpue<ref
-  bit     =target*(cpue/ref)^(1+ifelse(flag,-control[1],control[2]))
-  res     =(catch+bit)/2
+  coef       =-control["k1"]
+  flag       =cpue>ref
+  coef[,flag]=control["k2",flag]
   
+  bit     =target%*%(cpue%/%ref)%^%coef
+  res     =(catch+bit)
+
   dmns=dimnames(catch)
   dmns$year=yrs
   dmns$iter=dimnames(cpue)$iter

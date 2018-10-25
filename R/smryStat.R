@@ -3,6 +3,7 @@
 #Discounted yield
 #AAV in yield
 
+
 avFn<-function(object){
   
   o1 =object[-length(object)]
@@ -32,6 +33,12 @@ udFn<-function(object){
   o2 =object[-length(object)]
   
   return(sum(o1<o2))/(length(object)-1)}
+
+dRate=function(x,r,wtAv=FALSE) {
+  if (wtAv) 
+    return( sum(x/(1+r)^(0:(length(x)-1)))/sum(1/(1+r)^(0:(length(x)-1))))
+  return(sum(x/(1+r)^(0:(length(x)-1))))
+}
 
 smryStat<-function(dat,dr=0){
   with(dat, data.frame(safety  =min(rec_hat/virgin_rec,na.rm=T),

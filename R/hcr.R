@@ -108,7 +108,6 @@ hcrFn<-function(object,refs,
   for (i in seq(dims(object)$iter)){
     FLCore::iter(rtn,i)[]=max(FLCore::iter(rtn,i),FLCore::iter(fmin,i))
     FLCore::iter(rtn,i)[]=min(FLCore::iter(rtn,i),FLCore::iter(ftar,i))} 
-  
   rtn=window(rtn,end=max(hcrYrs))
   #dimnames(rtn)$year=min(hcrYrs)  
 
@@ -148,8 +147,6 @@ hcrFn<-function(object,refs,
       object=window(object, end=max(as.numeric(hcrYrs)))
     object[,ac(max(as.numeric(hcrYrs)))]=object[,ac(max(as.numeric(hcrYrs))-1)]
 
-    #object[,ac(max(as.numeric(hcrYrs)))]=object[,ac(max(as.numeric(hcrYrs))-1)]
-    
     if ("FLStock"%in%is(object))      
        object=fwd(object,fbar=fbar(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=refs)
      else

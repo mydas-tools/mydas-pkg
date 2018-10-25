@@ -11,7 +11,13 @@ mseSBTP<-function(
   #years over which to run MSE, doesnt work if interval==1, this is a bug
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
-  control=c(k1=0.25,k2=0.25),refYr="missing",
+  control=c(k1=0.25,k2=0.25),
+  
+  #how many years to go back from current year
+  yrU     =1:2,   #to estimate current index level    
+  yrCatch =seq(interval)-1,     #to estimate last catch
+  refU    ="missing", #years for reference Index
+  refCatch="missing", #years for reference catch
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.5){
@@ -28,7 +34,7 @@ mseSBTP<-function(
   maxF=median(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF)
   
   ## Observation Error (OEM) setup
-  cpue=window(stock(om),end=start)
+  cpue=window(ssb(om),end=start)
   
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
   
@@ -40,17 +46,17 @@ mseSBTP<-function(
     ## Observation Error, using data from last year back to the last assessment
     ## CPUE
     cpue=window(cpue,end=iYr-1)
-    cpue[,ac(iYr-(interval:1))]=stock(om)[,ac(iYr-(interval:1))]%*%uDev[,ac(iYr-(interval:1))]
+    cpue[,ac(iYr-(interval:1))]=ssb(om)[,ac(iYr-(interval:1))]%*%uDev[,ac(iYr-(interval:1))]
 
     #### Management Procedure
     ##Constant catch
     #tac=hcrConstantCatch(iYr+1,catch=catch(om)[,ac(iYr-(2:1))]) 
-    tac=hcrSBTP(yrs    =iYr+seq(interval),
-               control=control,
-               catch  =apply(catch(om)[,ac(iYr-seq(interval)-1)],6,mean),
-               cpue   =apply(cpue[,     ac(iYr-1:interval)],     6,mean),
-               ref    =apply(cpue[,     ac(refYr)],              6,mean),
-               target =apply(catch(om)[,ac(refYr)],              6,mean))
+    tac=hcrSBTP(yrs   =iYr+seq(interval),
+                control=control,
+                ref     =apply(cpue[,     ac(refU)],       6,mean),
+                target  =apply(catch(om)[,ac(refCatch)],   6,mean),
+                cpue    =apply(cpue[,     ac(iYr-yrU)],    6,mean),
+                catch   =apply(catch(om)[,ac(iYr-yrCatch)],6,mean))
 
     #### Operating Model update
     om =fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(maxF))
