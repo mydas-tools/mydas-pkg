@@ -36,9 +36,14 @@ udFn<-function(object){
 
 dRate=function(x,r,wtAv=FALSE) {
   if (wtAv) 
-    return( sum(x/(1+r)^(0:(length(x)-1)))/sum(1/(1+r)^(0:(length(x)-1))))
-  return(sum(x/(1+r)^(0:(length(x)-1))))
-}
+     return( sum(x/(1+r)^(0:(length(x)-1)))/sum(1/(1+r)^(0:(length(x)-1))))
+ return(sum(x/(1+r)^(0:(length(x)-1))))
+ }
+
+dRate2=function(x,r) {
+  wt =1/((1+r)^(0:(length(x)-1)))
+  res=sum(x*wt)/sum(wt)
+  res}
 
 smryStat<-function(dat,dr=0){
   with(dat, data.frame(safety  =min(rec_hat/virgin_rec,na.rm=T),

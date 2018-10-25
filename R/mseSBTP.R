@@ -60,7 +60,7 @@ mseSBTP<-function(
 
     #### Operating Model update
     om =fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(maxF))
-    print(plot(window(om,end=iYr+interval)))
+    #print(plot(window(om,end=iYr+interval)))
   }
   cat('==\n')
   

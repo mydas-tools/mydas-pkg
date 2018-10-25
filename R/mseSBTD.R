@@ -55,13 +55,8 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-(interval:1)+1)])
     maxf=mean(maxF)
     
-save(om,tac,eq,srDev,maxf,
-     file="/home/laurence/Desktop/tmp/om1.RData")
-
     #### Operatin Model update
     om =fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(maxF))
-    
-save(om,file="/home/laurence/Desktop/tmp/om2.RData")
     
     print(plot(window(om,end=iYr+interval)))
     }
