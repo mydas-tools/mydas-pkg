@@ -2,3 +2,17 @@
 .Rhistory
 *.RData
 mydas-pkg.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+**/data
+**/docs
+**/inputs
+**/*.RData
+**/*.csv
+**/*.log
+**/*.aux
+**/*.toc
+**/*.backup
+**/*.gz

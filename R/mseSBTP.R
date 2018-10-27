@@ -24,7 +24,7 @@ mseSBTP<-function(
 
   ##So you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
-  
+ 
   ## Make sure number of iterations are consistent
   nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(srDev)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
