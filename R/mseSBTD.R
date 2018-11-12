@@ -17,8 +17,8 @@ mseSBTD<-function(
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Capacity, i.e. F in OM can not be greater than this
-  maxF=1.5,
-  nyrs=3){
+  nyrs=5,
+  maxF=5.0){
 
   ##So you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
@@ -29,7 +29,7 @@ mseSBTD<-function(
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
   ## Limit on capacity, add to fwd(om) if you want
-  maxF=median(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF)
+  #maxF=median(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF)
 
   ## Observation Error (OEM) setup
   cpue=window(ssb(om),end=start)
@@ -48,15 +48,14 @@ mseSBTD<-function(
     #### Management Procedure
     ##Constant catch
     #tac=hcrConstantCatch(iYr+1,catch=catch(om)[,ac(iYr-(2:1))]) 
-    
+   
     tac=hcrSBTD(iYr+seq(interval),
                 control=control,
                 cpue[,ac(iYr-(nyrs:1))],
                 catch(om)[,ac(iYr-(interval:1)+1)])
-    maxf=mean(maxF)
     
-    #### Operatin Model update
-    om =fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(maxF))
+    #### Operating Model update
+    om=fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(fbar(om))*maxF)
     
     print(plot(window(om,end=iYr+interval)))
     }

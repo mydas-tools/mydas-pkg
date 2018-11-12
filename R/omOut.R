@@ -17,8 +17,8 @@ omStock<-function(object){
   
   catchJuv<-function(object) apply(catch.n(object)%*%(1-mat(object))%*%catch.wt(object),2:6,sum)
 
-  res=FLQuants(object,"ssb"=ssb,"stock"=FLCore:::stock,"rec"=recs,"catch"=FLCore:::catch,"catchjuv"=catchJuv,
-                      "fbar"=fbar,
+  res=FLQuants(object,"ssb"=FLCore:::ssb,"stock"=FLCore:::stock,"rec"=recs,"catch"=FLCore:::catch,"catchjuv"=catchJuv,
+                      "fbar"=FLCore:::fbar,
                       "swt"=swt,"cwt"=cwt,"sage"=sage,"cage"=cage)
   
   model.frame(mcf(res),drop=TRUE)}
