@@ -16,9 +16,11 @@
   control=propagate(FLPar(control),dims(lambda)$iter)
 
   gain=control["k1"]
-  gain[1,flag1]=-(control["k1",flag1])%*%(lambda[,,,,,flag1]%^%control["gamma",flag1])
+  if (length(flag1)>0)
+   gain[1,flag1]=-(control["k1",flag1])%*%(lambda[,,,,,flag1]%^%control["gamma",flag1])
 
-  gain[1,flag2]=  control["k2",flag2] %*% lambda[,,,,,flag2]
+  if (length(flag2)>0)
+    gain[1,flag2]=  control["k2",flag2] %*% lambda[,,,,,flag2]
   #res   =1+ifelse(flag,-control["k1"],control["k2"])*exp(log(lambda)*ifelse(flag,control["gamma"],1))
 
   res   =(1+gain)%*%apply(catch,6,mean)
