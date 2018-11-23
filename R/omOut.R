@@ -32,7 +32,6 @@ omRefs<-function(object){
 
   refs}
 
-
 omSmry<-function(x,y="missing",z="missing"){
   
   nms=c("iter","year","ssb","stock","rec","catch","catchjuv","fbar",
@@ -42,14 +41,24 @@ omSmry<-function(x,y="missing",z="missing"){
   res=omStock(x)
   
   if ("FLBRP" %in% is(y)){
-    res=merge(res,omRefs(refpts(y)))
-    rec=as.data.frame((params(y)["a"]%*%ssb(x))%/%(params(y)["b"]%+%ssb(x)),drop=T)
+    if (dims(y)$iter==1)
+      y=propagate(y,dim(x)[6])
     
+    res=merge(res,omRefs(refpts(y)))
+
+    rec=as.data.frame((params(y)["a"]%*%ssb(x))%/%(params(y)["b"]%+%ssb(x)),drop=T)
+
     names(rec)[(seq(dim(rec)[2]))[names(rec)=="data"]]="rec_hat"
     res=merge(res,rec)
     }
-  else if ("FLPar" %in% is(y))  
-    res=merge(res,omRefs(y))
+  else if ("FLPar" %in% is(y)){
+
+    if (dims(y)$iter==1)
+      y=propagate(y,dim(x)[6])
+    
+    rs2=omRefs(y)
+    res=merge(res,rs2,by="iter")
+    }
   
   if ("FLPar" %in% is(z))
     if (all(c("a","b") %in% dimnames(z)$params))

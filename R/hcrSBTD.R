@@ -13,7 +13,7 @@
   flag1=seq(dims(lambda)$iter)[ flag]
   flag2=seq(dims(lambda)$iter)[!flag]
   lambda =abs(lambda)
-  control=propagate(control,dims(lambda)$iter)
+  control=propagate(FLPar(control),dims(lambda)$iter)
 
   gain=control["k1"]
   gain[1,flag1]=-(control["k1",flag1])%*%(lambda[,,,,,flag1]%^%control["gamma",flag1])
