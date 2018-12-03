@@ -6,10 +6,7 @@ Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
 Depends:
     R (>= 3.4.1),
-    FLCore (>= 2.6.7)
-Imports:
-    FLCore
-    FLife
+    FLCore (>= 2.6.10)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
