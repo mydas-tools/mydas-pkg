@@ -1,5 +1,32 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
+warnings_are_errors: false
+
+language: r
+
+matrix:
+  include:
+    - os: linux
+      r: release
+
 sudo: false
+
 cache: packages
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+branches:
+  only:
+    - master
+
+repos:
+  CRAN: https://cloud.r-project.org
+  flr: http://flr-project.org/R
+
+after_failure:
+  - cat /home/travis/build/lauriekell/mydas-pkg/mydas.Rcheck/00install.out 
+  - cat /home/travis/build/lauriekell/mydas-pkg/mydas.Rcheck/00check.log
+  - ./travis-tool.sh dump_logs
