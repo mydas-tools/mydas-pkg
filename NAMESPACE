@@ -7,4 +7,3 @@ export("hcrSBTP")
 export("omSmry")
 
 import(FLCore)		
-import(FLife)	
