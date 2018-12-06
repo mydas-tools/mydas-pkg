@@ -46,7 +46,7 @@ omSmry<-function(x,y="missing",z="missing"){
     
     res=merge(res,omRefs(refpts(y)))
 
-    rec=as.data.frame((params(y)["a"]%*%ssb(x))%/%(params(y)["b"]%+%ssb(x)),drop=T)
+    rec=as.data.frame((params(y)["a"]%*%ssb(x))%/%(params(y)["b"]%+%ssb(x)))
 
     names(rec)[(seq(dim(rec)[2]))[names(rec)=="data"]]="rec_hat"
     res=merge(res,rec)

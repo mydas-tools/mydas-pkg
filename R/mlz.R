@@ -16,8 +16,9 @@ mlzFn<-function(year,len,lc,linf,k,ss=500){
   res}
 
 mlz<-function(object,params,ss=500){
-  nits=max(dim(object)[6],dims(params)$iter) 
   
+  nits=max(dim(object)[6],dims(params)$iter) 
+
   rtn=NULL  
   for (i in seq(nits)){
     
@@ -33,17 +34,24 @@ mlz<-function(object,params,ss=500){
     
     rtn=rbind(rtn,cbind(iter=i,res))}
   
+  return(rtn)
+  
   dimnames(rtn)[[2]][2:3]=c("hat","se")
   
   z=data.frame(subset(rtn,substr(dimnames(rtn)[[1]],1,1)=="Z"))
   z=ddply(z,.(iter), transform, block=seq(length(hat)))
-  if (!("iter"%in%names(z))) z=data.frame(iter=1,z)
   z=as(daply(z,.(block), with, as(data.frame(hat=hat,se=se,iter=iter),"FLPar")),"FLPar")
   
   y=subset(rtn,substr(dimnames(rtn)[[1]],1,1)!="Z")
   y=data.frame(y,name=substr(dimnames(y)[[1]],1,1))
   y=ddply(y,.(iter,name), transform, block=seq(length(hat)))
-  if (!("iter"%in%names(y))) y=data.frame(iter=1,y)
   y=as(daply(y,.(block,name), with, as(data.frame(hat=hat,se=se,iter=iter),"FLPar")),"FLPar")
   
-  FLPars("z"=z,"year"=y)}  
+  res=list("z"=z,"year"=y)
+  
+  return(res)
+  
+  names(res)=c("z","year")
+  
+  res}  
+
