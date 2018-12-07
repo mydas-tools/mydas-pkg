@@ -29,8 +29,8 @@ opts_chunk$set(cache     =TRUE,
                tidy      =TRUE,
                fig.height=6,
                fig.width =8,
-               fig.path  ="../tex/simtest/lbspr-",
-               cache.path="../cache/simtest/lbspr/")
+               fig.path  ="../tex/simtest/len-",
+               cache.path="../cache/simtest/len/")
 ```
 
 ```{r}
@@ -40,12 +40,12 @@ iFig=0
 ```
 
 ```{r, methods_to_go_in_pkgs, echo=FALSE,eval=FALSE}
-source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
-source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
-source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
-source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
-source('~/Desktop/sea++/mydas/pkg/R/omOut.R')
-source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
+#source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
+#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
+#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
+#source('~/Desktop/sea++/mydas/pkg/R/omOut.R')
+#source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
 ```
 
 
@@ -123,7 +123,7 @@ plot(eq)+
 
 
 ```{r turbot-f}
-gTime=c(round(mydas:::genTime(eq)))
+gTime=c(round(genTime(eq)))
 
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                               seq(.1,2,length.out=30),
@@ -176,7 +176,7 @@ library(popbio)
 ```
 
 ```{r, turbot-length}
-ts   =mydas:::omSmry(om,eq,lh)
+ts   =omSmry(om,eq,lh)
 mnLen=as.FLQuant(with(ts,data.frame(data=cln,year=year,iter=iter)))
 
 plot(mnLen)
@@ -185,11 +185,11 @@ plot(mnLen)
 
 ```{r}
 growth<-vonB
-prior=FLife:::priors(lh)
+prior=priors(lh)
 ```
 
 ```{r, turbot-mlz}
-res=mydas:::mlz(mnLen[,ac(40:60)],prior)
+res=mlz(mnLen[,ac(40:60)],prior)
 
 res
 ```
@@ -207,11 +207,11 @@ library(LBSPR)
 ```
 
 ```{r, turbot-alk}
-alk=mydas:::setALK(lh)  
+alk=setALK(lh)  
 ```
 
 ```{r, turbot-lfd}
-lfd=mydas:::lenSample(catch.n(om)[,20:65],alk,nsample=500)
+lfd=lenSample(catch.n(om)[,20:65],alk,nsample=500)
 ```
 
 ```{r, turbot-oemplot}
@@ -229,9 +229,9 @@ library(LBSPR)
 library(popbio)
 growth=vonB
 
-prior=FLife:::priors(lh)
+prior=priors(lh)
 
-lb=mydas:::lbspr(lfd,prior)  
+lb=lbspr(lfd,prior)  
 ```
 
 

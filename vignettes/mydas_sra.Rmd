@@ -1,0 +1,185 @@
+---
+title: "Simulation Testing Data Limited Methods **FLife**"
+subtitle: "Catch Only"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+github_document:
+  mathjax: TRUE
+pdf_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+---
+ 
+```{r, ini, echo=FALSE, results='hide', message=FALSE, warnings=FALSE, cache=FALSE,eval=!TRUE}
+library(knitr)
+source("R/ini.R")
+```
+
+```{r knitr_init, echo=FALSE, results="hide", eval=!FALSE}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =TRUE,
+               echo      =FALSE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =TRUE,
+               fig.height=6,
+               fig.width =8,
+               fig.path  ="../tex/simtest/srar-",
+               cache.path="../cache/simtest/sra/")
+```
+
+```{r}
+options(digits=3)
+
+iFig=0
+```
+
+```{r, methods_to_go_in_pkgs, echo=FALSE,eval=FALSE}
+#source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
+#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
+#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
+#source('~/Desktop/sea++/mydas/pkg/R/omOut.R')
+#source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
+#source('~/Desktop/flr/mpb/R/biodyn-sra.R')
+```
+
+
+# Introduction
+
+This tutorial describes how to simuation test data limited methods in `FLR` using a variety of other packages.
+
+## Required packages
+
+To follow this tutorial you should have installed the following packages:
+
+- FLR: [FLCore](http://www.flr-project.org/FLCore/), [FLBRP](http://www.flr-project.org/FLBRP/), [FLasher](http://www.flr-project.org/FLash/), [FLife](http://www.flr-project.org/FLife/)
+
+for example
+
+```{r, install, eval=FALSE}
+install.packages(c("FLCore"),  repos="http://flr-project.org/R")
+install.packages(c("FLBRP"),   repos="http://flr-project.org/R")
+install.packages(c("FLasher"), repos="http://flr-project.org/R")
+install.packages(c("FLife"),   repos="http://flr-project.org/R")
+```
+
+```{r, pkgs}
+# Load  packages
+library(ggplot2)
+library(plyr)
+library(reshape)
+
+library(FLCore)
+library(ggplotFL)
+library(FLBRP)
+library(FLasher)
+library(FLife)
+```
+
+# Operating Model
+
+Turbot
+
+```{r}
+lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
+lh=lhPar(lh)
+eq=lhEql(lh)
+
+gTime=c(round(genTime(eq)))
+
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out=30),
+                                              seq(2,1.0,length.out=gTime)[-1],
+                                              rep(1.0,61)))[,1:105]
+om=as(eq,"FLStock")
+om=fwd(om,f=fbar(om)[,-1], sr=eq)
+```
+
+```{r turbot-ts-ref}
+plot(FLQuants(om, 
+          "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
+          "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
+          "catch"=function(x) landings(x)%/%refpts(eq)["msy","yield"],
+          "rec" = function(x) rec(x)%/%refpts( eq)["msy","rec"])) + 
+  geom_hline(aes(yintercept=1),col="red",linetype=2)+
+  theme_bw() 
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series relative to MSY benchmarks.
+
+# Catch Only Based Methods
+
+
+```{r}
+## MP
+load("/home/laurence/Desktop/Dropbox/mydasOMs/data/turbot.RData")
+
+mp=setMP(as(window(om,end=55),"biodyn"),
+         r =median(prior["r"],na.rm=T),
+         k =median(prior["v"],na.rm=T),
+         b0=0.8,
+         p =median(p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
+
+nits=dims(om)$iter
+set.seed(1234)
+ srDev=rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+
+eq=FLCore:::iter(eq,seq(nits))
+
+mp=setMP(as(window(om,end=55),"biodyn"),
+                 r =median(prior["r"],na.rm=T),
+                 k =median(prior["v"],na.rm=T),
+                 b0=0.8,
+                 p =median(p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
+  
+res=mseSRA(om,eq,mp,
+              start=mseStart[stock],end=mseStart[stock]+40,
+              ftar=ftar,btrig=btrig,
+              srDev=srDev)
+  
+```
+
+```{r, turbot-fm}
+ggplot(melt(sweep(lb["FM"],c(1,3),lb["FM","40"],"/")))+
+  geom_boxplot(aes(ac(year),value))+
+  scale_x_discrete(breaks=seq(20,60,10))+
+  ylab("F")+xlab("Year")+theme_bw()
+```
+**Figure `r iFig=iFig+1; iFig`** Estimates of $F/M$ for turbot. 
+
+
+
+# References
+
+# More information
+
+* You can submit bug reports, questions or suggestions on this tutorial at <https://github.com/flr/doc/issues>.
+* Or send a pull request to <https://github.com/flr/doc/>
+* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage, <http://flr-project.org>.
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLasher: `r packageVersion('FLasher')`
+* **Compiled**: `r date()`
+
+## License
+
+This document is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0) license.
+
+## Author information
+
+**Laurence KELL**. laurie@seaplusplus.co.uk
+
+
+## Acknowledgements
+
+This vignette and the methods documented in it were developed under the MyDas project funded by the Irish exchequer and EMFF 2014-2020. The overall aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY) reference points (or proxy MSY reference points) across the spectrum of data-limited stocks.

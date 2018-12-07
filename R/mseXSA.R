@@ -79,7 +79,7 @@ mseXSA<-function(
   for (iYr in seq(start,end,interval)){
     #iYr=start
     cat(iYr,", ",sep="")
-   
+
     if (!(whitebox)){
       ## Observation Error, using data from last year back to the last assessment
       #sink("/dev/null")
@@ -94,9 +94,10 @@ mseXSA<-function(
       ## Update and fill in biological parameters
       if (iYr==start) 
         mp=window(mp,end=iYr-1)
-      else 
-        if (dims(mp)$maxyear>iYr) 
+      else
+        if (dims(mp)$maxyear<iYr) 
           mp=fwdWindow(mp,rf,end=iYr-1)
+
 
       ## Add catches and create plus group 
       #sink("/dev/null")
@@ -114,7 +115,8 @@ mseXSA<-function(
       catch.n(    mp)[,ac(iYr-(interval:1))]=catch.n(    mp.)
       catch.wt(   mp)[,ac(iYr-(interval:1))]=catch.wt(   mp.)
       stock.wt(   mp)[,ac(iYr-(interval:1))]=stock.wt(   mp.)
-      
+      mat(        mp)[,ac(iYr-(interval:1))]=     mat(   mp.)
+
       #### Management Procedure
       ## fit
       idx=FLIndex(index=cpue)
@@ -125,7 +127,6 @@ mseXSA<-function(
       range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
       mp=mp+xsa
       stock.n(mp)[is.na(stock.n(mp))]=1
-      
     }else{
       #sink("/dev/null")
       mp=trim(window(setPlusGroup(om,pGrp),end=iYr-1),age=range(mp)["min"]:range(mp)["max"])
@@ -154,27 +155,28 @@ mseXSA<-function(
       ## Reference points
       rf=brp(FLBRP(mp,sr=sr))
     }
-      
+
     ## in year update
     mp=fwdWindow(mp,rf,end=iYr)
-
+    
     mp[,ac(iYr)]=mp[,ac(iYr-1)]
     
     #try(save(om,mp,rf,file="/home/laurence/Desktop/tmp/mseXSA1.RData"))
     mp=fwd(mp,catch=catch(om)[,ac(iYr)],sr=list(model="bevholt",params=params(rf)),effort_max=maxF)
-      
+    
     print(plot(FLStocks(MP=mp,OM=window(om,start=dims(mp)$minyear,end=dims(mp)$maxyear))))
   
     ## HCR
     hcrPar=icesAR(rf,ftar=ftar,fmin=fmin,bpa=bpa,sigma=sigma)
-  
+    
     #try(save(mp,rf,hcrPar,iYr,file="/home/laurence/Desktop/tmp/mseXSA2.RData"))
+ 
     tac=hcr(mp,refs=rf,hcrPar,
             hcrYrs=iYr+seq(interval),
             bndTac=bndTac,
             tac =TRUE)
     tac[is.na(tac)]=1  
-
+    
     #### Operating Model update
     #try(try(save(om,eq,tac,srDev,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
     om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=srDev,effort_max=mean(maxF)) 

@@ -113,7 +113,7 @@ hcrFn<-function(object,refs,
 
   rtn=window(rtn,end=max(hcrYrs))
   rtn[,ac(hcrYrs)]=rtn[,dimnames(rtn)$year[1]]
-
+  
   ### Bounds ##################################################################################
   ## F
   if (!is.null(bndF)){  
@@ -134,24 +134,25 @@ hcrFn<-function(object,refs,
     }
 
   hvt=rtn
-
+  
   ## TAC
   if (!tac)
     return(hvt)
   else{
     ## TACs for target F
-
-    if ("FLBRP"%in%is(object))
+  
+    if ("FLStock"%in%is(object))
       object=fwdWindow(object, refs, end=max(as.numeric(hcrYrs)))
     else
       object=window(object, end=max(as.numeric(hcrYrs)))
+    
     object[,ac(max(as.numeric(hcrYrs)))]=object[,ac(max(as.numeric(hcrYrs))-1)]
-
-    if ("FLStock"%in%is(object))      
+    
+    if ("FLStock"%in%is(object)) 
        object=fwd(object,fbar=fbar(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=refs)
      else
        object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(hcrYrs)-1))])
-
+    
     hvt[is.na(hvt)]=6.6666
     #try(save(object,hvt,refs,hcrYrs,file="/home/laurence/Desktop/tmp/mseXSA4.RData"))
     if ("FLStock"%in%is(object))      

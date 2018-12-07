@@ -1,6 +1,6 @@
 ---
-title: "Management Strategy Evaluation **FLife**"
-subtitle: "Data Rich"
+title: "Management Strategy Evaluation using **FLife**"
+subtitle: "Data Rich and Poor Management Procedu"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -26,27 +26,37 @@ opts_chunk$set(cache     =TRUE,
                tidy      =FALSE,
                fig.height=6,
                fig.width =8,
-               fig.path  ='tex/mse/')
+               fig.path  ='tex/mse-')
 
 iFig=0
+```
+
+```{r}
+#source('~/Desktop/sea++/mydas/pkg/R/mseMPB.R')
+#source('~/Desktop/sea++/mydas/pkg/R/mseSBTD.R')
+#source('~/Desktop/sea++/mydas/pkg/R/hcrSBTD.R')
+
+#source('~/Desktop/sea++/mydas/pkg/R/mseXSA.R')
+#source('~/Desktop/sea++/mydas/pkg/R/hcr.R')
+
 ```
 
 
 [](#top)
 
-<!-- [Introduction](#Introduction) -->
+[Introduction](#Introduction) 
 
-<!-- [Operating Model](#Operating Model) -->
+[Operating Model](#Operating Model) 
 
-<!-- [Management Procedures](#Management Procedures) -->
+[Management Procedures](#Management Procedures) 
 
-<!-- [Age Based](##Age Based) -->
+[Age Based](##Age Based) 
 
-<!-- [Biomass Based](##Biomass Based) -->
+[Biomass Based](##Biomass Based) 
 
-<!-- [Emprirical](##Emprirical) -->
+[Emprirical](##Emprirical)
 
-<!-- [References](#References) -->
+[References](#References) 
 
 
 # Introduction
@@ -87,42 +97,39 @@ theme_set(theme_bw())
 
 ## FLife
 
-The `FLife` package is used to create a stock. The first steps are to load the example `teleost` dataset and select the parameters for albacore. 
+The `FLife` package is used to create a stock. 
 
-```{r teleost}
-data(teleost)
-
-teleost
-```
-
-```{r albacore}
-alb=lhPar(teleost[,"Thunnus alalunga"])
-
-alb
+```{r turbot}
+turbot=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 ```
 
 
 The `lhPar` method is then used to derive the parameters for natural mortality-at=age, based on @gislason2008does, and default parameters and relationships for selection pattern and  stock recruitment. 
 
+```{r}
+turbot=lhPar(turbot)
+
+turbot
+```
+
 The default parameters can be changed, e.g. by changing a parameter. `sl` is the standard deviation for the lefthand limb of the double normal selection pattern, here we change it from 2 to 1 to make it steeper.
 
-```{r dnormal-sl}
-alb["sl"]=1
-```
 
 ## Equilibrium dynamics
 
 The parameters are then used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruiment relationship.
 
 ```{r eql}
-eql=lhEql(alb)
+eq=lhEql(turbot)
+
+range(eq)[c("minfbar","maxfbar")]=ceiling(mean(turbot["a1"]))
 ```
 
 ```{r vectors, echo=FALSE, fig.height=6}
 sel<-function(x) 
   catch.sel(x)%/%fapex(catch.sel(x))
 
-ggplot(FLQuants(eql,"m","catch.sel"=sel,"mat","catch.wt"))+
+ggplot(FLQuants(eq,"m","catch.sel"=sel,"mat","catch.wt"))+
   geom_line(aes(age,data))+
   facet_wrap(~qname,scale="free")+
   scale_x_continuous(limits=c(0,20))+ 
@@ -134,7 +141,7 @@ ggplot(FLQuants(eql,"m","catch.sel"=sel,"mat","catch.wt"))+
 Estimate equilibrium dynamics and reference points
 
 ```{r eqlcurves, echo=FALSE}
-plot(eql)
+plot(eq)
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
@@ -146,11 +153,13 @@ To go from equilibrium to time series dynamics the `FLBRP` object created by `lh
 First change the F time series so that it represents a time series where the stock was origionally lightly exploited, F increased until the stock was overfished and then fishing pressure was reduced to ensure spawning stock biomass was greater than $B_{MSY}$.
 
 ```{r fbar}
-fbar(eql)=refpts(eql)["msy","harvest"]*FLQuant(c(rep(.1,19),
-                                                         seq(.1,2,length.out=40),
-                                                         seq(2,.7,length.out=11)[-1],
-                                                         rep(.7,61)))[,1:105]
-om=as(eql,"FLStock")
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out = 30),
+                                              seq(2,1.0,length.out = 10),
+                                              rep(1.0,61)))[,1:105]
+om=as(eq,"FLStock")
+
+om=fwd(om,fbar=fbar(om)[,-1],sr=eq)
 ```
 
 
@@ -161,23 +170,22 @@ To simulation random variation in the time series, deviations around the stock r
 While to generate data for use in the MP, random measurement error was added to the simulated catch per unit effort (CPUE).
 
 ```{r stock-stochastic-u}
+nits=10
 set.seed(3321)
-uDev =rlnorm(nits,setPlusGroup(stock.n(eql),20)*0,.2)
+uDev =rlnorm(nits,setPlusGroup(stock.n(eq),20)*0,.2)
 ```
 
 These deviates were then used to create a stochastic time series by projecting the dynamics from year 1.
 
 ```{r stock-stochastic-rec}
-nits=200
-
 set.seed(1234)
-srDev=FLife:::rlnoise(nits,fbar(om)%=%0,.3,b=0.0)
+srDev=rlnoise(nits,fbar(om)%=%0,.3,b=0.0)
 ```
 
 
 ```{r stock-stochastic-plot, echo=FALSE}
 plot(srDev)+
-    geom_point(aes(year,data,col=iter),data=as.data.frame(iter(srDev,c(7,12,19))))
+    geom_point(aes(year,data,col=iter),data=as.data.frame(iter(srDev,c(7,2,9))))
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
@@ -185,13 +193,13 @@ plot(srDev)+
 
 ```{r stock-stochastic-1}
 om =propagate(om,nits)
-oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],residuals=srDev,sr=eql))
+oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],residuals=srDev,sr=eq))
 ```
 
 ```{r stock-stochastic-2, echo=FALSE}
 plot(oms[["Projection"]])+
   geom_line(aes(year,data,col=iter,group=iter),
-            data=as.data.frame(FLQuants(iter(oms[["Projection"]],c(7,12,19)),
+            data=as.data.frame(FLQuants(iter(oms[["Projection"]],c(7,1)),
                                         "Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
   theme(legend.position="none")
 ```
@@ -199,7 +207,7 @@ plot(oms[["Projection"]])+
 **Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
 
 
-<!-- [Back to Top](#top) -->
+[Back to Top](#top) 
 
 \newpage
 
@@ -231,23 +239,25 @@ In this example the MP is based on an Virtual Population Analysis (VPA).
 First the control settings are checked by running `FLXSA` on data simulated by the OM without error and feedback. Ideally there should be no bias in the estimates from the stock assessment 
 
 ```{r xsa-xtest}
+library(FLXSA)
 mp=window(setPlusGroup(oms[["Projection"]],20),end=80)
 
-##Assessment
-control=FLXSA.control(tol    =1e-16, maxit   =150,
-                      min.nse=0.3,   fse     =0.5,
-                      rage   =2,     qage    =10,
-                      shk.n  =TRUE,  shk.f   =TRUE,
-                      shk.yrs=10,    shk.ages=10,
-                      window =10,    tsrange =10,
-                      tspower=0,
-                      vpa    =!TRUE)
-  
+xsaControl=FLXSA.control(tol    =1e-09, maxit   =150, 
+                         min.nse=0.3,   fse     =1.0, 
+                         rage   =1,     qage    =6, 
+                         shk.n  =TRUE,  shk.f   =TRUE, 
+                         shk.yrs=1,     shk.ages=4, 
+                         window =10,    tsrange =10, 
+                         tspower= 0,
+                         vpa    =FALSE)
+```
+
+```{r xsa-xtest-2}
 idx=FLIndex(index=stock.n(mp)%*%uDev[,dimnames(stock.n(mp))$year])
 range(idx)[c("plusgroup","startf","endf")]=c(NA,0.1,.2)
 
 xsa=FLXSA(mp,idx,
-          control=control,diag.flag=FALSE)
+          control=xsaControl,diag.flag=FALSE)
 range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
 mp=mp+xsa
 
@@ -266,18 +276,16 @@ Before running the MSE, i.e. using XSA as part of a feedback control procedure, 
 Then the MSE can be run using the `mseXSA` function
 
 ```{r xsa-mse, eval=FALSE}
-source('~/Desktop/sea++/mydas/pkg/R/mseXSA.R')
-
-oms[["Age"]]=mseXSA(oms[["Projection"]],eql, #OM
+oms["Age"]=mseXSA(oms[["Projection"]],eq, #OM
                     mp,control,rf=rf,        #MP
                     srDev=srDev,uDev=uDev,   #Random deviates for OM 
                     start=75,end=103,maxF=1.0)        #year range
 ```
 
-```{r xsa-mse-plot, echo=FALSE, eval=FALSE}
+```{r xsa-mse-plot, echo=FALSE,eval=FALSE}
 plot(oms[["Age"]])+
-  geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(iter(oms[["Age"]],c(7,12,19)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
+  geom_line(aes(year,data,col=iter,group=iter),
+            data=as.data.frame(FLQuants(iter(oms[["Age"]],c(7,2,9)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
   theme(legend.position="none")
 ```
 
@@ -290,90 +298,90 @@ In `mpb` there is a biomass dynamic stock assessment, designed to be used as an 
 
 First the control object has to be set, i.e. setting best guess, bounds and any priors for parameters.
 
-```{r biodyn, eval=FALSE}
-mp        =as(window(oms[["Projection"]],start=20,end=75),"biodyn")
-mp@indices=FLQuants("1"=(stock(oms[["Projection"]][,20:74])+
-                         stock(oms[["Projection"]][,21:75]))/2.0)
 
-params(    mp)["r"]=.25
-mp=fwd(    mp,catch=catch(mp))
-setParams( mp)=mp@indices[[1]]
+```{r, echo=FALSE}
+library(plyr)
+library(dplyr)
+library(reshape)
+library(ggplot2)
 
-setControl(mp)=params(mp)
-control(   mp)["r",2:4]=c(.05,0.25,1.0)
-control(   mp)["q1",]=c(-1,.1,1,10)
+library(FLCore)
+library(ggplotFL)
+library(FLasher)
+library(FLBRP)
+library(FLife)
+library(mpb)
+library(mydas)
 ```
 
 Then the assessment is run without feedback
 
-```{r biodyn-2,eval=FALSE}
-mp=fit(mp)
-```
-
 and compared to the OM
 
-
-```{r biodyn-test-2, echo=FALSE, eval=FALSE}
-setControl(mp)=params(mp)
-dat=plot(FLQuants(fit(mp),"Biomass"=stock,"F"=function(x) catch(x)/stock(x)[,dimnames(catch(x))$year]))$data
-
-plot(FLQuants(window(oms[["Projection"]],start=20,end=75),"Biomass"=stock,"F"=function(x) catch(x)/stock(x)))+
-  geom_line(  aes(year,`50%`),data=dat,fill="blue",col="blue")+
-  geom_ribbon(aes(year,ymax=`75%`,ymin=`25%`),data=dat,alpha=.25,fill="blue",col="blue")
+```{r biodyn-2}
+## MP
+mp=mpb:::setMP(as(window(om,end=75),"biodyn"),
+         r =   0.25,
+         k =1000.0,
+         b0=   0.9,
+         p =  -0.6)
 ```
+
 
 **Figure `r iFig=iFig+1; iFig`** Comparision of estimates and simulated time series of harvest rate and stock biomass.
 
 
-```{r biodyn-mse, eval=FALSE}
-source('~/Desktop/flr/mpb/R/hcr.R')
+```{r biodyn-3}
+nits=dims(om)$iter
+set.seed(1234)
+srDev =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.3,b=0.0)
+uDev  =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.2,b=0.0)
+selDev=rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(    m(om),1))),0.2,b=0.0)
 
-setControl(mp)=params(mp)
+eq=FLCore:::iter(eq,seq(nits))
 
-oms[["Biomass"]]=
-  mseMPB(window(oms[["Projection"]],start=20,end=103),eql,mp,srDev=srDev,uDev=uDev,start=75,end=103)
+oms["Biomass"]=mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,srDev=srDev,uDev=uDev,selDev=selDev)
 ```
+  
 
-```{r biodyn-mse-plot, echo=FALSE, eval=FALSE}
+```{r biodyn-mse-plot, echo=FALSE}
 plot(window(oms[["Biomass"]],end=100))+
-  geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(window(iter(oms[["Biomass"]],c(7,12,19)),end=100),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
+  geom_line(aes(year,data,col=iter,group=iter),
+            data=as.data.frame(FLQuants(window(iter(oms[["Biomass"]],c(7,2,9)),end=100),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
   theme(legend.position="none")
 ```
 **Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
 
 
-```{r biodyn-mse-2, eval=FALSE}
-oms[["Biomass2"]]=
-  mseMPB(window(oms[["Projection"]],start=20,end=103),eql,mp,srDev=srDev,uDev=uDev,ftar=0.5,start=75,end=103)
-```
-
-```{r biodyn-mse-plot-2, echo=FALSE, eval=FALSE
-norfolk }
-plot(window(oms[["Biomass2"]],end=100))+
-  geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(window(iter(oms[["Biomass"]],c(7,12,19)),end=100),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
-  theme(legend.position="none")
-```
-**Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
 
 
 ## Empirical
 
-```{r emp,eval=FALSE}
-oms[["Emprirical"]]=mseEMP(oms[["Projection"]],eql,srDev=srDev,uDev=uDev,start=75,end=103)
+```{r}
+save(om,eq,control,srDev,uDev,file="/home/laurence/Desktop/tmp/test.RData")
 ```
 
-```{r emp-mse-plot, echo=FALSE,eval=FALSE}
+```{r emp}
+control=FLPar(k1=0.5,k2=0.5,gamma=1)
+oms["Emprirical"]=mseSBTD(om,eq,control=control,
+                            srDev=srDev,uDev=uDev,
+                            start=75,end=100)
+```
+
+```{r emp-mse-plot, echo=FALSE}
 plot(window(oms[["Emprirical"]],end=100))+
-  geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(iter(window(oms[["Emprirical"]],end=100),c(7,12,19)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))
+  geom_line(aes(year,data,col=iter,group=iter),
+            data=as.data.frame(FLQuants(iter(window(oms[["Emprirical"]],end=100),c(7,2,9)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
 
 
-<!-- [Back to Top](#top) -->
+```{r,eval=FALSE}
+res=ldply(oms,omSmry,eq)
+```
+
+[Back to Top](#top) 
 
 \newpage
 
@@ -396,5 +404,5 @@ This vignette and many of the methods documented in it were developed under the 
 
 # References {#References}
 
-<!-- [Back to Top](#top) -->
+[Back to Top](#top) 
 

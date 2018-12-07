@@ -24,7 +24,7 @@ library(knitr)
 opts_chunk$set(echo    =!TRUE,
                eval    =!TRUE,
                cache   =FALSE,
-               cache.path="cache/oem",
+               cache.path="cache/oem/",
                prompt  =FALSE,
                comment =NA,
                message =FALSE,
@@ -32,7 +32,7 @@ opts_chunk$set(echo    =!TRUE,
                warnings=FALSE,
                fig.height=4.5,
                fig.width =4.5,
-               fig.path  ="tex/oem")
+               fig.path  ="tex/oem-")
 ```
 
 ```{r, cpue, echo=!TRUE, eval=TRUE}
@@ -63,7 +63,7 @@ lh=lhPar(lh)
 
 eq=lhEql(lh)
 
-gTime=c(round(mydas:::genTime(eq)))
+gTime=c(round(genTime(eq)))
 
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                                  seq(.1,2,length.out=30),
@@ -355,7 +355,7 @@ ggplot()+
 library(reshape)
 lh=lhPar(FLPar(linf=89))
 
-alk=mydas:::setALK(lh)  
+alk=setALK(lh)  
 ```
 
 ```{r, turbot-lfd,echo=TRUE,eval=TRUE}
@@ -366,7 +366,7 @@ lh=lhPar(lh)
 
 eq=lhEql(lh)
 
-gTime=c(round(mydas:::genTime(eq)))
+gTime=c(round(genTime(eq)))
 
 eq@fbar=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                                  seq(.1,2,length.out=30),
@@ -376,7 +376,7 @@ om=as(eq,"FLStock")
 
 om=fwd(om,f=fbar(om)[,-1], sr=eq)
 
-lfd=mydas:::lenSample(catch.n(om)[,20:65],alk,nsample=500)
+lfd=lenSample(catch.n(om)[,20:65],alk,nsample=500)
 ```
 
 ```{r, turbot-oemplot,echo=TRUE,eval=TRUE}

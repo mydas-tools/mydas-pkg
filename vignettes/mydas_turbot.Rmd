@@ -1,0 +1,199 @@
+---
+title: "**FLife**"
+subtitle: "Example of Constructing an Operating Model"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Laurence Kell"
+output: rmarkdown:::pdf_document
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{FLife-WKLife}
+  %\VignetteEncoding{UTF-8}
+bibliography: refs.bib
+tags: FLPKG FLR
+license: Creative Commons Attribution-ShareAlike 4.0 International
+---
+
+
+```{r knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =TRUE,
+               cache.path='cache/turbot/',
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8,
+               fig.path  ='tex/turbot-')
+
+
+iFig=0
+```
+
+
+```{r, pkgs, message=FALSE}
+library(ggplotFL)
+library(plyr)
+library(reshape)
+library(FLBRP)
+library(FLife)
+```
+
+```{r, theme, echo=FALSE}
+theme_set(theme_bw())
+options(digits=3)
+```
+
+## Install FLR packages
+
+To follow this tutorial you will have to install a number of packages, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
+
+Install FLR from [https://www.flr-project.org/](www.flr-project.org/)
+```{r}
+install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
+             repos="http://flr-project.org/R")
+```
+
+`devtools` needs to be installed and then loaded so that the `mydas` package can be installed from this GitHub repository.
+
+```{r}
+install.packages("devtools",dependencies=TRUE)
+```
+
+```{r}
+library(devtools)
+
+devtools::install_github("lauriekell/mydas-pkg")
+```
+
+## Load Libraries
+```{r}
+library(plyr)
+library(reshape)
+library(ggplot2)
+```
+
+```{r}
+library(FLCore)
+library(FLasher)
+library(FLBRP)
+library(FLife)
+library(mydas)
+```
+
+## Operating Model Conditioning using `FLife`
+
+### Life history parameters
+Get fishbase data
+```{r}
+load(url("https://github.com//fishnets//fishnets//blob//master//data//fishbase-web//fishbase-web.RData?raw=True"))
+```
+
+Select turbot as a case study
+```{r}
+lh=subset(fb,species=="Psetta maxima")
+
+names(lh)[c(14,17)] = c("l50","a50")
+lh=lh[,c("linf","k","t0","a","b","a50","l50")]
+
+head(lh)
+```
+
+Get the means and create an `FLPar` object
+```{r}
+lh=apply(lh,2,mean,na.rm=T)
+lh=FLPar(lh)
+```
+
+Values can be replace with any [better estimates](https://www.researchgate.net/publication/236650425_Ecological_and_economic_trade-offs_in_the_management_of_mixed_fisheries_A_case_study_of_spawning_closures_in_flatfish_fisheries) that may be available.
+
+`lhPar` fills in missing values using life history theory, while quantities like selection-at-age are set using defaults, in this case set to be the same as maturity-at-age.  
+
+
+```{r}
+?lhPar
+```
+
+```{r}
+par=lhPar(lh)
+par
+```
+
+The parameters are then be used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruitment relationship, by creating an [`FLBRP` object](https://www.flr-project.org/doc/Reference_points_for_fisheries_management_with_FLBRP.html)
+
+```{r}
+eq=lhEql(par)
+
+plot(eq)
+```
+
+To model time series the FLBRP object created by lhEql is coerced to an FLStock object and then [projected forward](https://www.flr-project.org/doc/Forecasting_on_the_Medium_Term_for_advice_using_FLasher.html)
+
+For example a fishing time series is simulated that represents a stock that was originally lightly exploited, then effort is increased until the stock is overfished and then fishing pressure was reduced to recover the stock biomass to BMSY.
+
+```{r}
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out = 30),
+                                              seq(2,1.0,length.out = 10),
+                                              rep(1.0,61)))[,1:105]
+plot(fbar(eq))
+```
+Coercing the FLBRP object into an FLStock
+
+```{r}
+om=as(eq,"FLStock")
+```
+We can simply plot the forward F projection catch, recruitment and biomass estimates etc..
+We call fwd() with the stock, the control object (fbar) and the stock recruitment relationship, and look at the results
+
+```{r}
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq)
+```
+can change the units here also
+```{r}
+units(catch(om)) = units(discards(om)) = units(landings(om)) = units(stock(om)) = 'tonnes'
+units(catch.n(om)) = units(discards.n(om)) = units(landings.n(om)) = units(stock.n(om)) = '1000'
+units(catch.wt(om)) = units(discards.wt(om)) = units(landings.wt(om)) = units(stock.wt(om)) = 'kg'
+
+plot(om)
+```
+
+### Stochasticity 
+To add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
+```{r}
+srDev=rlnoise(nits, rec(om) %=% 0, 0.3)
+
+om=propagate(om,nits)
+
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq, residuals=srDev)
+```
+
+```{r}
+plot(om)
+```
+
+
+**Figure `r iFig=iFig+1; iFig`** Simulate a stock with increasing F
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLPKG: `r # packageVersion('FLPKG')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Laurence KELL**. laurie@seaplusplus.co.uk
+
+## Acknowledgements
+
+
+# References {#References}
+
+
