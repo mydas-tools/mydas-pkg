@@ -343,7 +343,6 @@ eq=FLCore::iter(eq,seq(nits))
 oms["Biomass"]=mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,srDev=srDev,uDev=uDev,selDev=selDev)
 ```
   
-
 ```{r biodyn-mse-plot, echo=FALSE}
 plot(window(oms[["Biomass"]],end=100))+
   geom_line(aes(year,data,col=iter,group=iter),

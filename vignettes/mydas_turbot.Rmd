@@ -2,17 +2,16 @@
 title: "**FLife**"
 subtitle: "Example of Constructing an Operating Model"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-author: "Laurence Kell"
-output: rmarkdown::pdf_document
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{FLife-WKLife}
-  %\VignetteEncoding{UTF-8}
+output:
+github_document:
+  mathjax: TRUE
+pdf_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
 bibliography: refs.bib
-tags: FLPKG FLR
-license: Creative Commons Attribution-ShareAlike 4.0 International
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
 ---
-
 
 ```{r knitr_init, echo=FALSE, results="hide"}
 library(knitr)

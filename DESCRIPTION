@@ -1,12 +1,12 @@
 Package: mydas
 Title: Tools for conducting Management Strategy Evaluation for data limited stocks
-Version: 0.0.0.9000
+Version: 1.0.3.0
 Author: Laurence Kell <laurie@seaplusplus.co.uk>	
 Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
 Depends:
-    R (>= 3.4.1),
-    FLCore (>= 2.6.10)
+  R(>= 3.5.1),
+  FLCore (>= 2.6.10)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
