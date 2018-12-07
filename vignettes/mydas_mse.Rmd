@@ -320,7 +320,7 @@ and compared to the OM
 
 ```{r biodyn-2}
 ## MP
-mp=mpb:::setMP(as(window(om,end=75),"biodyn"),
+mp=setMP(as(window(om,end=75),"biodyn"),
          r =   0.25,
          k =1000.0,
          b0=   0.9,
@@ -338,7 +338,7 @@ srDev =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.3,b=0.0)
 uDev  =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.2,b=0.0)
 selDev=rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(    m(om),1))),0.2,b=0.0)
 
-eq=FLCore:::iter(eq,seq(nits))
+eq=FLCore::iter(eq,seq(nits))
 
 oms["Biomass"]=mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,srDev=srDev,uDev=uDev,selDev=selDev)
 ```

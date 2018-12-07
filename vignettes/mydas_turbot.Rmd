@@ -3,7 +3,7 @@ title: "**FLife**"
 subtitle: "Example of Constructing an Operating Model"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Laurence Kell"
-output: rmarkdown:::pdf_document
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{FLife-WKLife}
@@ -53,7 +53,7 @@ options(digits=3)
 To follow this tutorial you will have to install a number of packages, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
 
 Install FLR from [https://www.flr-project.org/](www.flr-project.org/)
-```{r}
+```{r, eval=FALSE}
 install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
              repos="http://flr-project.org/R")
 ```
@@ -64,7 +64,7 @@ install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"),
 install.packages("devtools",dependencies=TRUE)
 ```
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 library(devtools)
 
 devtools::install_github("lauriekell/mydas-pkg")
@@ -165,6 +165,8 @@ plot(om)
 ### Stochasticity 
 To add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
 ```{r}
+nits=100
+
 srDev=rlnoise(nits, rec(om) %=% 0, 0.3)
 
 om=propagate(om,nits)

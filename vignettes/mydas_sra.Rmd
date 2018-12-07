@@ -131,7 +131,7 @@ nits=dims(om)$iter
 set.seed(1234)
  srDev=rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
 
-eq=FLCore:::iter(eq,seq(nits))
+eq=FLCore::iter(eq,seq(nits))
 
 mp=setMP(as(window(om,end=55),"biodyn"),
                  r =median(prior["r"],na.rm=T),
