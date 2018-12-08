@@ -1,6 +1,6 @@
 ---
 title: "**FLife**"
-subtitle: "MSY Proxies"
+subtitle: "Conditioning Operating Models on Data"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:

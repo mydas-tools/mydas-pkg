@@ -1,6 +1,6 @@
 ---
 title: "**FLife**"
-subtitle: "Example of Constructing an Operating Model"
+subtitle: "Example of Conditioning an Operating Model"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -84,7 +84,12 @@ library(FLife)
 library(mydas)
 ```
 
-## Operating Model Conditioning using `FLife`
+## Plotting
+
+Plotting is done using `ggplot2` which provides a powerful alternative paradigm for creating both simple and complex plots in R using the ideas the *Grammar of Graphics* ^[Wilkinson, L. 1999. *The Grammar of Graphics*, Springer. [doi 10.1007/978-3-642-21551-3_13](http://dx.doi.org/10.1007/978-3-642-21551-3_13).] The idea of the grammar is to specify the individual building blocks of a plot and then to combine them to create the graphic desired^[<http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html>].
+
+The `ggplot` functions expects a `data.frame` for its first argument, `data`; then a geometric object `geom` that specifies the actual marks put on to a plot and an aesthetic that is "something you can see" have to be provided. Examples of geometic Objects (geom) include points (geom_point, for scatter plots, dot plots, etc), lines (geom_line, for time series, trend lines, etc) and boxplot (geom_boxplot, for, well, boxplots!). Aesthetic mappings are set with the aes() function and, examples include, position (i.e., on the x and y axes), color ("outside" color), fill ("inside" color), shape (of points), linetype and size. 
+
 
 ### Life history parameters
 Get fishbase data
@@ -114,27 +119,41 @@ Values can be replace with any [better estimates](https://www.researchgate.net/p
 
 
 ```{r}
-?lhPar
-```
-
-```{r}
 par=lhPar(lh)
 par
 ```
 
 The parameters are then be used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruitment relationship, by creating an [`FLBRP` object](https://www.flr-project.org/doc/Reference_points_for_fisheries_management_with_FLBRP.html)
 
+
 ```{r}
 eq=lhEql(par)
+```
 
+```{r vectors, echo=FALSE, fig.height=6}
+sel<-function(x) 
+  catch.sel(x)%/%fapex(catch.sel(x))
+
+ggplot(FLQuants(eq,"m","catch.sel"=sel,"mat","catch.wt"))+
+  geom_line(aes(age,data))+
+  facet_wrap(~qname,scale="free")+
+  scale_x_continuous(limits=c(0,20))+ 
+  guides(colour=guide_legend(title="Species",title.position="top"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
+
+```{r}
 plot(eq)
 ```
 
+**Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
+
 To model time series the FLBRP object created by lhEql is coerced to an FLStock object and then [projected forward](https://www.flr-project.org/doc/Forecasting_on_the_Medium_Term_for_advice_using_FLasher.html)
 
-For example a fishing time series is simulated that represents a stock that was originally lightly exploited, then effort is increased until the stock is overfished and then fishing pressure was reduced to recover the stock biomass to BMSY.
+Simulate a time series that represents a stock that was originally lightly exploited, then effort is increased until the stock is overfished and then fishing pressure was reduced to recover the stock biomass to BMSY.
 
-```{r}
+```{r, fbar, fig.height=2}
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                               seq(.1,2,length.out = 30)[-30],
                                               seq(2,1.0,length.out = 10),
@@ -146,23 +165,27 @@ Coercing the FLBRP object into an FLStock
 ```{r}
 om=as(eq,"FLStock")
 ```
-We can simply plot the forward F projection catch, recruitment and biomass estimates etc..
-We call fwd() with the stock, the control object (fbar) and the stock recruitment relationship, and look at the results
 
-```{r}
+Call `fwd()` with the stock, the target F and a stock recruitment relationship
+
+```{r, om-fwd}
 om=fwd(om,fbar=fbar(om)[,-1], sr=eq)
 ```
-can change the units here also
-```{r}
-units(catch(om)) = units(discards(om)) = units(landings(om)) = units(stock(om)) = 'tonnes'
-units(catch.n(om)) = units(discards.n(om)) = units(landings.n(om)) = units(stock.n(om)) = '1000'
-units(catch.wt(om)) = units(discards.wt(om)) = units(landings.wt(om)) = units(stock.wt(om)) = 'kg'
 
-plot(om)
+
+```{r stock-stochastic-2, echo=FALSE}
+plot(om)+
+  geom_line(aes(year,data,col=iter,group=iter),
+            data=as.data.frame(FLQuants(iter(om,c(7,1)),
+                                        "Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
+  theme(legend.position="none")
 ```
 
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
+
 ### Stochasticity 
-To add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
+Add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
+
 ```{r}
 nits=100
 
