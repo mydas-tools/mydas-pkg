@@ -1,3 +1,5 @@
+#' @export mseXSA
+
 # The ICES Advice Rule for stocks where a wide range of stock sizes 
 # has been seen so the stock recruitment relationship can be estimated
 #

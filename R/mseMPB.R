@@ -1,3 +1,8 @@
+#' @export mseMPB
+#' @export mseMPB2
+#' @export
+#' @export
+
 mpTrace<-function(mp,par,tac){
   
   rtn1=cbind(model.frame(params(mp)),

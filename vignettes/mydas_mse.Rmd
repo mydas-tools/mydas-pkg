@@ -319,6 +319,8 @@ Then the assessment is run without feedback
 and compared to the OM
 
 ```{r biodyn-2}
+source('~/Desktop/flr/mpb/R/setMP.R')
+
 ## MP
 mp=setMP(as(window(om,end=75),"biodyn"),
          r =   0.25,
@@ -332,6 +334,9 @@ mp=setMP(as(window(om,end=75),"biodyn"),
 
 
 ```{r biodyn-3}
+source('~/Desktop/sea++/mydas/pkg/R/mseSBTD.R')
+source('~/Desktop/sea++/mydas/pkg/R/hcrSBTD.R')
+
 nits=dims(om)$iter
 set.seed(1234)
 srDev =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.3,b=0.0)

@@ -1,4 +1,6 @@
-  hcrSBTD<-function(yrs,
+#' @export hcrSBTD
+#' 
+hcrSBTD<-function(yrs,
                     control=FLPar(c(k1=0.25,k2=0.25,gamma=1)),
                     index,
                     catch,...){
