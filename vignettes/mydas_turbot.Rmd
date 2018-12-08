@@ -183,6 +183,17 @@ plot(om)+
 
 **Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
 
+```{r ts}
+plot(FLQuants(om,   
+          "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
+          "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
+          "rec" = function(x) rec(x)%/%refpts( eq)["msy","rec"], 
+          "catch"=function(x) landings(x)%/%refpts(eq)["msy","yield"])) + 
+  geom_hline(aes(yintercept=1),col="red") 
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series relative to MSY benchmarks.
+
 ### Stochasticity 
 Add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
 
