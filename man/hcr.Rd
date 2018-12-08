@@ -40,4 +40,3 @@ for (i in seq(29,49,1))
 bd=fwd(bd,harvest=hcr(bd,yr=i,yr=i+1)$hvt)
 }
 }
-

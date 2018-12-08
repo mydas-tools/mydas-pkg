@@ -39,15 +39,6 @@ options(digits=3)
 iFig=0
 ```
 
-```{r, methods_to_go_in_pkgs, echo=FALSE,eval=FALSE}
-#source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
-#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
-#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
-#source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
-#source('~/Desktop/sea++/mydas/pkg/R/omOut.R')
-#source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
-```
-
 
 # Introduction
 
@@ -85,56 +76,19 @@ library(FLife)
 
 Turbot
 
-```{r, turbot-par}
+```{r, turbot}
+source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
-```
-
-```{r, turbot-lh}
 lh=lhPar(lh)
-```
-
-```{r, turbot-eq}
 eq=lhEql(lh)
-```
 
-```{r, turbot-vector}
-sel<-function(x) 
-  catch.sel(x)%/%fapex(catch.sel(x))
-
-dat=FLQuants(eq,"M"=m,"Selectivity"=sel,"Maturity"=mat,"Mass"=stock.wt)
-dat=as.data.frame(dat)
-
-ggplot(dat)+
-  geom_line(aes(age,data))+
-  facet_wrap(~qname,scale="free")+
-  scale_x_continuous(limits=c(0,10))+
-  xlab("Age")+ylab("")
-```
-
-**Figure `r iFig=iFig+1; iFig`** Operating model for turbot. 
-
-
-```{r, turbot-curves, fig.width=8,fig.height=6}
-plot(eq)+
-  theme_bw()  
-```
-
-**Figure `r iFig=iFig+1; iFig`** Example equilibrum Curve.
-
-
-```{r turbot-f}
-gTime=c(round(genTime(eq)))
-
+gTime=c(round(gt(eq)))
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                              seq(.1,2,length.out=30),
+                                              seq(.1,2,length.out=30)[-30],
                                               seq(2,1.0,length.out=gTime)[-1],
                                               rep(1.0,61)))[,1:105]
-plot(fbar(eq))
-```
 
-**Figure `r iFig=iFig+1; iFig`** Example equilibrum Curve.
-
-```{r}
 om=as(eq,"FLStock")
 om=fwd(om,f=fbar(om)[,-1], sr=eq)
 ```
@@ -176,6 +130,8 @@ library(popbio)
 ```
 
 ```{r, turbot-length}
+source('~/Desktop/sea++/mydas/pkg/R/omOut.R')
+
 ts   =omSmry(om,eq,lh)
 mnLen=as.FLQuant(with(ts,data.frame(data=cln,year=year,iter=iter)))
 
@@ -184,11 +140,15 @@ plot(mnLen)
 **Figure `r iFig=iFig+1; iFig`** Mean length of catch turbot. 
 
 ```{r}
-growth<-vonB
+source('~/Desktop/flr/FLife/R/priors.R')
+
+#growth<-vonB
 prior=priors(lh)
 ```
 
 ```{r, turbot-mlz}
+source('~/Desktop/sea++/mydas/pkg/R/mlz.R')
+
 res=mlz(mnLen[,ac(40:60)],prior)
 
 res
@@ -207,11 +167,13 @@ library(LBSPR)
 ```
 
 ```{r, turbot-alk}
-alk=setALK(lh)  
+source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
+
+ak=alk(lh)  
 ```
 
 ```{r, turbot-lfd}
-lfd=lenSample(catch.n(om)[,20:65],alk,nsample=500)
+lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
 ```
 
 ```{r, turbot-oemplot}
@@ -227,7 +189,11 @@ ggplot(melt(lfd[,seq(1,45,10)]))+
 ```{r, turbot-sa}
 library(LBSPR)
 library(popbio)
-growth=vonB
+
+source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
+source('~/Desktop/sea++/mydas/pkg/R/priors.R')
+
+#growth=vonB
 
 prior=priors(lh)
 

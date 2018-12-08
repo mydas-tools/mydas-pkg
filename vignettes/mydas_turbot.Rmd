@@ -136,7 +136,7 @@ For example a fishing time series is simulated that represents a stock that was 
 
 ```{r}
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                              seq(.1,2,length.out = 30),
+                                              seq(.1,2,length.out = 30)[-30],
                                               seq(2,1.0,length.out = 10),
                                               rep(1.0,61)))[,1:105]
 plot(fbar(eq))

@@ -88,11 +88,13 @@ library(FLife)
 Turbot
 
 ```{r}
+source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 lh=lhPar(lh)
 eq=lhEql(lh)
 
-gTime=c(round(genTime(eq)))
+gTime=c(round(gt(eq)))
 
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                               seq(.1,2,length.out=30),
@@ -119,6 +121,10 @@ plot(FLQuants(om,
 
 ```{r}
 ## MP
+library(mpb)
+source('~/Desktop/flr/mpb/R/setMP.R')
+source('~/Desktop/flr/mpb/R/pellam.R')
+
 load("/home/laurence/Desktop/Dropbox/mydasOMs/data/turbot.RData")
 
 mp=setMP(as(window(om,end=55),"biodyn"),

@@ -6,8 +6,9 @@ mydas-pkg.Rproj
 .Rhistory
 .RData
 .Ruserdata
+**/demo
 **/data
-**/docs
+**/documents
 **/inputs
 **/*.RData
 **/*.csv
@@ -16,3 +17,8 @@ mydas-pkg.Rproj
 **/*.toc
 **/*.backup
 **/*.gz
+_rslurm_test_apply
+_rslurm_randomD
+wiki
+tex
+cache

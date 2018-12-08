@@ -19,7 +19,7 @@ http://rpubs.com/pl202/436164
 library(knitr)
 ## Global options
 opts_chunk$set(cache     =TRUE,
-               cache.path='cache/proxies/',
+               cache.path='cache/performance/',
                echo      =TRUE,
                eval      =TRUE,
                prompt    =FALSE,
@@ -29,7 +29,7 @@ opts_chunk$set(cache     =TRUE,
                tidy      =FALSE,
                fig.height=6,
                fig.width =8,
-               fig.path  ='tex/proxies-')
+               fig.path  ='tex/performance-')
 
 
 iFig=0

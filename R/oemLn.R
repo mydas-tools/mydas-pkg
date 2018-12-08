@@ -1,4 +1,36 @@
-setALK<-function(par,age=0:40,cv=0.2,lmax=1.2){
+#' alk
+#' 
+#' @title alk
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#' 
+#' @name alk
+#' @param par \code{FLPar} with `linf` or  \code{numeric}
+#' @param age \code{numeric} 0:40 by default
+#' @param cv  \code{numeric} 0.2 by default
+#' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
+#'  
+#' @aliases
+#' 
+#' @export alk
+#' @docType method
+#' 
+#' @rdname alk
+#' @seealso lenSample
+#' 
+#' @examples
+#' s\dontrun{
+#' ak=alk(FLPar(linf=50))
+#' }
+setGeneric('alk', function(object,...) standardGeneric('alk'))
+
+setMethod('alk', signature(object="FLPar"),
+          function(object,age=0:40,cv=0.2,lmax=1.2,...)
+            
+            setALKFn(object,age,cv,lmax))
+
+setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
   
   alk=mdply(data.frame(age=age), function(age,par,cv,lmax){
     res=adply(par,2,function(x,age,cv,lmax){
@@ -16,7 +48,38 @@ setALK<-function(par,age=0:40,cv=0.2,lmax=1.2){
   
   alk}
 
-lenSample<-function(object,alk,nsample){
+#' lenSample
+#' 
+#' @title slenSample 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++  
+#' 
+#' @name lenSample
+#' @param object \code{FLStock}
+#' @param alk \code{FLPar} with ALK
+#' @param nsample \code{numeric} sample size
+#'  
+#' @aliases
+#' 
+#' @export lenSample
+#' @docType method
+#' 
+#' @rdname lenSample
+#' @seealso setALK
+#' 
+#' @examples
+#' \dontrun{
+#' lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],alk,nsample=100)
+#' }
+setGeneric('lenSample', function(object,alk,...) standardGeneric('lenSample'))
+
+setMethod('lenSample', signature(object="FLQuant",alk="FLPar"),
+          function(object,alk,nsample=500,...)
+            
+            lenSampleFn(object,alk,nsample))
+
+lenSampleFn<-function(object,alk,nsample){
   
   res=mdply(expand.grid(iter=seq(dim(object)[6]),year=seq(dim(object)[2])),
          function(iter,year){ 
@@ -34,7 +97,7 @@ if (FALSE){
   library(dplyr)
 
   load("/home/laurence/Desktop/sea++/mydas/tasks/task4/data/turbot.RData")
-  alk=setALK(FLPar(lh[,1]))
+  alk=alk(FLPar(lh[,1]))
   lfd=lenSample(stock.n(om)[,95:100,,,,1:2],alk,nsample=5000)
     
   ggplot(melt(lfd))+

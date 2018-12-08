@@ -22,8 +22,8 @@ source("R/ini.R")
 library(knitr)
 ## Global options
 opts_chunk$set(echo    =!TRUE,
-               eval    =!TRUE,
-               cache   =FALSE,
+               eval    =TRUE,
+               cache   =TRUE,
                cache.path="cache/oem/",
                prompt  =FALSE,
                comment =NA,
@@ -57,13 +57,15 @@ setMethod('cpue',   signature(object='FLStock'),
 ```
 
 ```{r, om, echo=FALSE}
+source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 
 lh=lhPar(lh)  
 
 eq=lhEql(lh)
 
-gTime=c(round(genTime(eq)))
+gTime=c(round(gt(eq)))
 
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                                  seq(.1,2,length.out=30),
@@ -137,7 +139,7 @@ The link between the OM and the MP is the Observation Error Model (OEM), which g
 
 The simplest way to obtain mpb is to install it from CRAN by using the following command in the R console:
 
-```{r install}
+```{r install, eval=FALSE}
 install.packages("mpb", repos = "http://flr-project.org/R")
 ```
 
@@ -352,31 +354,41 @@ ggplot()+
 
 
 ```{r, turbot-alk,echo=TRUE,eval=TRUE}
+source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
+
 library(reshape)
 lh=lhPar(FLPar(linf=89))
 
-alk=setALK(lh)  
+ak=alk(lh)  
 ```
 
 ```{r, turbot-lfd,echo=TRUE,eval=TRUE}
+source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
+
+library(FLBRP)
 library(FLasher)
+
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 
 lh=lhPar(lh)  
 
 eq=lhEql(lh)
 
-gTime=c(round(genTime(eq)))
+gTime=c(round(gt(eq)))
 
-eq@fbar=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                                  seq(.1,2,length.out=30),
                                                  seq(2,1.0,length.out=gTime)[-1],
                                                  rep(1.0,61)))[,1:105]
 om=as(eq,"FLStock")
 
 om=fwd(om,f=fbar(om)[,-1], sr=eq)
+```
 
-lfd=lenSample(catch.n(om)[,20:65],alk,nsample=500)
+```{r, lfd}
+source('~/Desktop/sea++/mydas/pkg/R/oemLn.R') 
+
+lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
 ```
 
 ```{r, turbot-oemplot,echo=TRUE,eval=TRUE}
