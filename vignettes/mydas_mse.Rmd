@@ -332,10 +332,17 @@ mp=setMP(as(window(om,end=75),"biodyn"),
 
 **Figure `r iFig=iFig+1; iFig`** Comparision of estimates and simulated time series of harvest rate and stock biomass.
 
+```{r}
+save(om,eq,mp,file="/home/laurence/Desktop/tmp/om.RData")
+```
+
 
 ```{r biodyn-3}
-source('~/Desktop/sea++/mydas/pkg/R/mseSBTD.R')
-source('~/Desktop/sea++/mydas/pkg/R/hcrSBTD.R')
+library(FLasher)
+library(mpb)
+
+source('~/Desktop/sea++/mydas/pkg/R/hcr.R')
+source('~/Desktop/sea++/mydas/pkg/R/mseMPB.R')
 
 nits=dims(om)$iter
 set.seed(1234)
@@ -366,6 +373,9 @@ save(om,eq,control,srDev,uDev,file="/home/laurence/Desktop/tmp/test.RData")
 ```
 
 ```{r emp}
+source('~/Desktop/sea++/mydas/pkg/R/hcrSBTD.R')
+source('~/Desktop/sea++/mydas/pkg/R/mseSBTD.R')
+
 control=FLPar(k1=0.5,k2=0.5,gamma=1)
 oms["Emprirical"]=mseSBTD(om,eq,control=control,
                             srDev=srDev,uDev=uDev,
