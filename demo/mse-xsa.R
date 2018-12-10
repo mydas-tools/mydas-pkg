@@ -12,8 +12,8 @@ library(FLAssess)
 library(FLXSA)
 library(mpb)
 
-source('~/Desktop/flr/mpb/R/hcr.R')
-source('~/Desktop/flr/mpb/R/mseXSA.R')
+#source('~/Desktop/flr/mpb/R/hcr.R')
+#source('~/Desktop/flr/mpb/R/mseXSA.R')
 #source('~/Desktop/flr/FLife/R/omOut.R')
 #source('~/Desktop/flr/mse/R/msy.R')
 

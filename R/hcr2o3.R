@@ -42,7 +42,7 @@ if (FALSE){
    scale_x_log10()+
    scale_y_log10()
  
-source('~/Desktop/flr/FLife/R/omOut.R')
+#source('~/Desktop/flr/FLife/R/omOut.R')
  
 object=omSmry(om,eq,lh)
 object=subset(object,year>=57)

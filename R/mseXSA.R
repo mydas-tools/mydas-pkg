@@ -50,6 +50,8 @@ mseXSA<-function(
   maxF=1.0,
   whitebox=FALSE){ 
   
+  if (dims(om)$iter==1 & dims(srDev)$iter>1) om=propagate(om,dims(srDev)$iter)
+  
   ##Check last year so you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
 

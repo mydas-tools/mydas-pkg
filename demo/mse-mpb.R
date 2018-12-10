@@ -12,9 +12,9 @@ library(mpb)
 
 mseStart=c("brill"=54,"turbot"=54,"ray"=60,"pollack"=56,"sprat"=52,"razor"=54,"lobster"=57)
 
-source('~/Desktop/flr/mpb/R/mseMPB.R')
-source("/home/laurence/Desktop/flr/mpb/R/hcr.R")
-source('~/Desktop/flr/FLife/R/omOut.R')
+#source('~/Desktop/flr/mpb/R/mseMPB.R')
+#source("/home/laurence/Desktop/flr/mpb/R/hcr.R")
+#source('~/Desktop/flr/FLife/R/omOut.R')
 
 theme_set(theme_bw())
 
