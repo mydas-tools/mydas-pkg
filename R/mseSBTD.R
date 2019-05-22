@@ -57,7 +57,7 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-rev(seq(interval))+1)])
    
     #### Operating Model update
-    om=fwd(om,catch=tac,sr=eq,residual=srDev) #,effort_max=mean(fbar(om))*maxF)
+    om=fwd(om,catch=tac,sr=eq,residual=srDev, maxF=mean(fbar(om))*maxF)
 
     #print(plot(window(om,end=iYr+interval)))
     }
