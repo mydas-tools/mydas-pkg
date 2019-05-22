@@ -1,9 +1,9 @@
 #' @export hcrSBTD
 #' 
 hcrSBTD<-function(yrs,
-                    control=FLPar(c(k1=0.25,k2=0.25,gamma=1)),
-                    index,
-                    catch,...){
+                  control=FLPar(c(k1=0.25,k2=0.25,gamma=1)),
+                  index,
+                  catch,...){
   lambda=as.FLQuant(ddply(transform(as.data.frame(index%/%apply(index,6,mean)),iter=as.numeric(ac(iter))), 
                           .(iter), with, data.frame(data=coefficients(lm(data~year))[2])))
 #lambda.<<-lambda

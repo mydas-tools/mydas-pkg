@@ -3,7 +3,7 @@ lbsprFn<-function(len,params,species="",units="cm"){
   pars        =new("LB_pars")
   pars@Linf   =c(params["linf"]) 
   pars@L50    =vonB(c(params["a50"]),params) 
-  pars@L95    =pars@L50+vonB(c(params["ato95"]),params)
+  pars@L95    =vonB(c(params["a50"])+c(params["ato95"]),params)
   pars@MK     =c(params["mk"])
   pars@Species=species
   pars@L_units=units

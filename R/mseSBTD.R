@@ -17,7 +17,7 @@ mseSBTD<-function(
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Capacity, i.e. F in OM can not be greater than this
-  nyrs=5,
+  nyrs  =5,
   cpueFn=ssb,
   lag   =1,
   maxF  =2.5){
@@ -57,7 +57,7 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-rev(seq(interval))+1)])
    
     #### Operating Model update
-    om=fwd(om,catch=tac,sr=eq,residual=srDev,effort_max=mean(fbar(om))*maxF)
+    om=fwd(om,catch=tac,sr=eq,residual=srDev) #,effort_max=mean(fbar(om))*maxF)
 
     #print(plot(window(om,end=iYr+interval)))
     }

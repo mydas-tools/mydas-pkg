@@ -1,4 +1,4 @@
-mlzFn<-function(year,len,lc,linf,k,ss=500){
+mlzFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
   
   dat=new("MLZ_data", 
           Year         =unique(year), 
@@ -10,12 +10,12 @@ mlzFn<-function(year,len,lc,linf,k,ss=500){
   dat@vbLinf=linf
   dat@vbK   =k
   
-  hat=ML(dat,ncp=1,figure=FALSE)
+  hat=ML(dat,ncp=ncp,figure=FALSE)
   
   res=hat@estimates
   res}
 
-mlz<-function(object,params,ss=500){
+mlz<-function(object,params,ncp=2,ss=500){
   
   nits=max(dim(object)[6],dims(params)$iter) 
 
@@ -30,6 +30,7 @@ mlz<-function(object,params,ss=500){
          lc  =c(iter(prior["lc"],  i)),
          linf=c(iter(prior["linf"],i)),
          k   =c(iter(prior["k"],   i)),
+         ncp=ncp,
          ss=ss)
     
     rtn=rbind(rtn,cbind(iter=i,res))}
@@ -54,4 +55,18 @@ mlz<-function(object,params,ss=500){
   names(res)=c("z","year")
   
   res}  
+
+mlz.z<-function(object,data){
+  year=as.numeric(dimnames(data)$year)
+  brk =round(object[grep("year",dimnames(object)[[1]]),2])
+  year=c(min(year),brk,max(year))
+  
+  rtn =mdply(data.frame(block=seq(length(year)-1)),function(block)
+    data.frame(year=year[block]:year[block+1]))
+  
+  z   =object[substring(dimnames(object)[[1]],1,1)=="Z",2:3]
+  dimnames(z)[[2]]=c("z","se")
+  
+  z   =data.frame(block=seq(dim(z)[1]),z)
+  merge(rtn,z)[,c(2,1,3:4)]}
 
