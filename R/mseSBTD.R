@@ -20,7 +20,7 @@ mseSBTD<-function(
   nyrs  =5,
   cpueFn=ssb,
   lag   =1,
-  maxF  =2.5){
+  maxF  =10){
 
   ##So you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)

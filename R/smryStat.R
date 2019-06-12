@@ -45,8 +45,28 @@ dRate2=function(x,r) {
   res=sum(x*wt)/sum(wt)
   res}
 
+trend=function(x) {
+  #x=x%/%apply(x,6,mean)
+  #as.FLQuant(ddply(as.data.frame(x), .(unit,season,area,iter), with,
+  #          data.frame(data=lm(data~year)$coefficients[2])))
+  
+  x=x/mean
+  data.frame(data=lm(x~seq(length(x))$coefficients[2]))
+  }
+
+randomness=function(obj) {
+  #as.FLQuant(ddply(as.data.frame(obj), .(unit,season,area,iter), with,
+  #                 data.frame(data=difference.sign.test(data)[["p.value"]])))
+  difference.sign.test(obj)[["p.value"]]}
+
 smryStat<-function(dat,dr=0){
   with(dat, data.frame(safety  =min(rec_hat/virgin_rec,na.rm=T),
+                       blim    =mean(ssb/virgin_ssb,na.rm=T),
+                       ftar    =min(fbar/msy_harvest,na.rm=T),
+                       btar    =min(ssb/msy_ssb,na.rm=T),
                        kobe    =green((ssb/msy_ssb>1)&(fbar/msy_harvest<1),year)[1:2],
                        yield   =dRate(catch/msy_yield,dr)/length(catch),
-                       yieldAav=mean(avFn(pmax(catch,msy_yield*0.1)))))}
+                       yieldAav=mean(avFn(pmax(catch,msy_yield*0.1))),
+                       yieldRnd=randomness(catch),
+                       ssbRnd  =randomness(ssb),
+                       fbRnd   =randomness(fbar)))}
