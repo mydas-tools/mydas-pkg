@@ -30,9 +30,6 @@ mseSBTD<-function(
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
-  ## Limit on capacity, add to fwd(om) if you want
-  #maxF=median(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF)
-
   ## Observation Error (OEM) setup
   cpue=window(cpueFn(om),end=start)
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
@@ -57,9 +54,7 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-rev(seq(interval))+1)])
    
     #### Operating Model update
-    om=fwd(om,catch=tac,sr=eq,residual=srDev, maxF=mean(fbar(om))*maxF)
-
-    #print(plot(window(om,end=iYr+interval)))
+    om=fwd(om,catch=tac,sr=eq,residual=srDev,maxF=maxF)
     }
   cat('==\n')
   
