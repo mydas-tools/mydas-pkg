@@ -1,6 +1,26 @@
+utils::globalVariables(c("data","iaF","laply","loess","resc","year","coefficients","res"))
 
 #http://www.ices.dk/sites/pub/Publication%20Reports/Expert%20Group%20Report/acom/2017/WKMSYCAT34/01.%20WKMSYCAT34%20REPORT%202017.pdf
 
+#' hcr
+#' 
+#' @title hcr 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name hcr
+#' #' 
+#' @export hcr
+#' @docType methods
+#' 
+#' @rdname hcr
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 hcr2o3<-function(yrs,
          catch,
          index,

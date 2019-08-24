@@ -1,7 +1,49 @@
+utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
+
+#' #http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf
+
+#' mse
+#' 
+#' @title mseMPB 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mseMPB
+#' 
+#' @aliases mseMPB mseMPB-method mseMPB,FLStock,FLBRP-method
+#' 
+#' @export mseMPB
+#' @docType methods
+#' 
+#' @rdname mseMPB
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#'
+#' @param om
+#' @param eq
+#' @param mp
+#' @param ftar=1.0
+#' @param btrig=0.5
+#' @param fmin=0.05
+#' @param blim=0.3,        
+#' @param 
+#'  #years over which to run MSE
+#' @param interval=3
+#' @param start=range(om)["maxyear"]-30
+#' @param end=range(om)["maxyear"]-interval,
+#' #Stochasticity
+#' @param srDev #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
+#' @param uDev  #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
+#' #Capacity, i.e. F in OM can not be greater than this
+#' @param maxF=1.5){ 
+  
+#'
 #' @export mseMPB
 #' @export mseMPB2
-#' @export
-#' @export
 
 mpTrace<-function(mp,par,tac){
   
@@ -18,10 +60,10 @@ icesBD<-function(bd,fmsy=1.0,btrig=0.5,blim=0.3, fmin=0.05){
   # http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf
  
   hcrParam(
-    fmsy =fmsy(bd),
-    btrig=bmsy(bd)*btrig,
-    blim =bmsy(bd)*blim,
-    fmin =fmsy(bd)*fmin)}
+    ftar =mpb::fmsy(bd),
+    btrig=mpb::bmsy(bd)*btrig,
+    blim =mpb::bmsy(bd)*blim,
+    fmin =mpb::fmsy(bd)*fmin)}
 
 mseMPB<-function(
   #OM
@@ -251,8 +293,7 @@ mseAlbn<-function(
   
   ## Cut in capacity
   maxF=FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF
-  maxF.<<-maxF
-  
+
   ## Loop round years
   for (iYr in seq(start,end-interval,interval)){
     cat(iYr,", ",sep="")

@@ -1,3 +1,9 @@
+utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sign.test","lm"))
+
+#'
+#' @importFrom stats lm
+#' 
+
 lbsprFn<-function(len,params,species="",units="cm"){
   
   pars        =new("LB_pars")

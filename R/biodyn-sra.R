@@ -1,3 +1,5 @@
+utils::globalVariables(c("setParams<-","setControl<-","fit"))
+                       
 sra<-function(object,depletion,nyr=1){
   index=FLQuant(NA,dimnames=dimnames(catch(object)))
   

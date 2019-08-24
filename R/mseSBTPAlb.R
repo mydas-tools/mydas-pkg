@@ -1,3 +1,25 @@
+utils::globalVariables(c("hcrSBT1","hcrSBT2"))
+utils::globalVariables(c("hcrSBT2"))
+
+#' mse
+#' 
+#' @title mseEMPSBT2Alb 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mseEMPSBT2Alb
+#' 
+#' @export mseEMPSBT2Alb
+#' @docType methods
+#' 
+#' @rdname mseEMPSBT2Alb
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 mseEMPSBT2Alb<-function(
   #OM
   om,eq,

@@ -1,3 +1,21 @@
+#' hcr
+#' 
+#' @title hcr 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name hcr
+#' 
+#' @export hcr
+#' @docType methods
+#' 
+#' @rdname hcr
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
 #' @export hcrSBTD
 #' 
 hcrSBTD<-function(yrs,

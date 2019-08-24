@@ -1,3 +1,5 @@
+utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
+
 priors<-function(object,eq=lhEql(lhPar(object))){
   
   par=lhPar(object)

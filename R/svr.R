@@ -1,35 +1,16 @@
-#' gt
-#' 
-#' @title gt 
-#' 
-#' @description 
-#' @author Laurence Kell, Sea++
-#'  
-#' @name gt
-#' @param object \code{FLBRP}
-#' 
-#' @aliases
-#' 
-#' @export gt
-#' @docType method
-#' 
-#' @rdname gt
-#' @seealso 
-#' 
-#' @examples
-#' \dontrun{
-#' data(pl4)
-#' alk=gt(FLBRP(ple4))
-#' }
+utils::globalVariables(c("as.formula"))
+
+require(caret)
+
 fitSvr=function(dat, target, predictors, tuneLength=5){
   
-  ctrl=caret::trainControl(
+  ctrl=caret:::trainControl(
     method ="repeatedcv",
     repeats=5)
   
   print(paste(target, "~", predictors, sep=" "))
   
-  svrFit = caret::train(
+  svrFit = caret:::train(
     as.formula(paste(target, "~", predictors, sep=" ")),
     data      =dat,
     method    ='svmRadial',

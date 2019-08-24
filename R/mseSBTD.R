@@ -1,8 +1,22 @@
-#' @import FLCore 
+#' mseSBTD
+#' 
+#' @title mseSBTD 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mseSBTD
 #' 
 #' @export mseSBTD
-#' @export hcrSBTD
-
+#' @docType methods
+#' 
+#' @rdname mseSBTD
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 mseSBTD<-function(
   #OM as FLStock and FLBRP
   om,eq,
@@ -47,7 +61,7 @@ mseSBTD<-function(
 
     #### Management Procedure
     ##Constant catch
-    #tac=hcrConstantCatch(iYr+1,catch=catch(om)[,ac(iYr-(2:1))]) 
+    #tac=hcrConstantCatch(iYr+1,catch=catch(om)[,ac(iYr-(21))]) 
     tac=hcrSBTD(iYr+seq(interval),
                 control=control,
                 cpue[,ac(iYr-uYrs)],

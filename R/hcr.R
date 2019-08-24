@@ -18,7 +18,8 @@
 #' hcrYrs numeric vector with years for setting management, max(as.numeric(dimnames(stock(object))$year)),
 #' tacMn \code{logical} should the TACs be the average of the values returned?
 #' maxF  =2 numeric vector specifying maximum relative F
-#' @aliases hcr,biodyn-method
+#' 
+# #' @aliases hcr,biodyn-method
 #'
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
 #'
@@ -33,7 +34,6 @@
 #' for (i in seq(29,49,1))
 #' bd=fwd(bd,harvest=hcr(bd,yr=i,yr=i+1)$hvt)
 #' }
-
 setGeneric('hcr', function(object,refs,...) standardGeneric('hcr'))
 
 setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
@@ -55,10 +55,10 @@ setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
                 params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
 setMethod('hcr', signature(object="biodyn",refs='FLPar'),
-  function(object,refs=hcrParam(ftar =0.70*mpb:::fmsy(refs),
-                                btrig=0.80*mpb:::bmsy(refs),
-                                fmin =0.01*mpb:::fmsy(refs),
-                                blim =0.40*mpb:::bmsy(refs)),
+  function(object,refs=hcrParam(ftar =0.70*mpb::fmsy(refs),
+                                btrig=0.80*mpb::bmsy(refs),
+                                fmin =0.01*mpb::fmsy(refs),
+                                blim =0.40*mpb::bmsy(refs)),
            params=refs,
            stkYrs=max(as.numeric(dimnames(stock(object))$year)),
            refYrs=max(as.numeric(dimnames(catch(object))$year)),

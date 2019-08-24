@@ -1,3 +1,24 @@
+utils::globalVariables(c("mlply","oem","yrRng","control","control<-","maxF.","oem"))
+
+#' mseEMPSBT1Alb
+#' 
+#' @title mseEMPSBT1Alb
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mseEMPSBT1Alb 
+#' 
+#' @export mseEMPSBT1Alb 
+#' @docType methods
+#' 
+#' @rdname mseEMPSBT1Alb 
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 mseEMPSBT1Alb<-function(
   #OM
   om,eq,

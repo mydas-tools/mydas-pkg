@@ -1,3 +1,5 @@
+utils::globalVariables(c("ggplot","geom_density","ggplot","geom_smooth","geom_point"))
+
 my_density <- function(data,mapping,...){
   ggplot(data=data,mapping=mapping)+
     geom_density(...,lwd=1)}

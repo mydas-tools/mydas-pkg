@@ -1,4 +1,24 @@
+utils::globalVariables(c("sra"))
 
+#' mse
+#' 
+#' @title mseSRA
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mseSRA
+#' 
+#' @export mseSRA
+#' @docType methods
+#' 
+#' @rdname mseSRA
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 mseSRA<-function(
   #OM
   om,eq,

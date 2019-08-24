@@ -1,15 +1,30 @@
 Package: mydas
 Title: Tools for conducting Management Strategy Evaluation for data limited stocks
-Version: 1.0.3.0
+Version: 1.1.0
 Author: Laurence Kell <laurie@seaplusplus.co.uk>	
 Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
 Depends:
-  R(>= 3.5.1),
-  FLCore (>= 2.6.10),
-  plyr,
-  reshape
-License: What license is it under?
+  R(>= 3.6.0),
+  FLCore (>= 2.6.13)
+Imports:
+  methods,
+Suggests:
+  stats
+License: GPL (>= 2)
+Collate: 
+  genTime.R
+  smryStat.R
+  lbspr.R
+  oemLn.R
+  omOut.R
+  priors.R
+  my_ggpairs.R
+  mlz.R
+  elas.R
+  iterShift.R
+  biodyn-sra.R
+  xsaTest.R     
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

@@ -1,4 +1,6 @@
-mlzFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
+utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","mlzFn","daply"))
+
+zFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
   
   dat=new("MLZ_data", 
           Year         =unique(year), 

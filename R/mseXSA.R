@@ -1,3 +1,39 @@
+utils::globalVariables(c("FLXSA","FLBRP","brp"))
+
+#' @name mseXSA
+#' 
+#' @title mseXSA 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @param om \code{FLStock} 
+#' @param eq \code{FLBRP} 
+#' @param mp \code{FLStock}
+#' @param control \code{FLXSA.control}
+#' @param rf \code{}
+#' @param ftar \code{numeric}  default is 1.0
+#' @param fmin \code{numeric}  default is 0.05 HCR
+#' @param bpa \code{numeric}  default is 0.5 HCR
+#' @param sigma \code{numeric}  default is 0.3 HCR
+#' @param bndTac\code{numeric}  default is c(0.01,100) Bounds on TAC changes
+#' @param start  \code{numeric}  default is range(om)["maxyear"]-30
+#' @param end  \code{numeric}  default is range(om)["maxyear"]-interval
+#' @param interval  \code{numeric}  default is 3 years over which to run MSE, doesnt work if interval==1, this is a bug
+#' @param srDev \code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
+#' @param uDev   \code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
+#' @param maxF  \code{numeric} 1.0 Capacity, i.e. F in OM can not be greater than this
+#' @param whitebox  \code{boolean} FALSE
+#' 
+#' @docType methods
+#' 
+#' @rdname mse
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 #' @export mseXSA
 
 # The ICES Advice Rule for stocks where a wide range of stock sizes 

@@ -1,6 +1,24 @@
+#' mse
+#' 
+#' @title mse 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name mse
+#' 
 #' @export mseSBTP
 #' @export hcrSBTP
-
+#' 
+#' @docType methods
+#' 
+#' @rdname mse
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+#' 
 mseSBTP<-function(
   #OM as FLStock and FLBRP
   om,eq,

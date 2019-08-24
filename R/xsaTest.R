@@ -1,3 +1,5 @@
+utils::globalVariables(c("FLXSA.control","FLXSA"))
+
 xsaTest<-function(om,pg=10,ctrl=FLXSA.control()){
   
   stk=setPlusGroup(om,pg)

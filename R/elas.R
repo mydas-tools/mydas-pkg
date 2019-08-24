@@ -24,7 +24,7 @@ gtFn=function(x){
     res=params["m1"]%*%res
     res})
   
-  c("gt"    =genTime(eql),
+  c("gt"    =gt(eql),
     "age"   =aMsy(eql),
     "lopt"  =lopt(x,m=function(l,params){
       wt=params["a"]*(l^params["b"])

@@ -3,7 +3,6 @@
 #Discounted yield
 #AAV in yield
 
-
 avFn<-function(object){
   
   o1 =object[-length(object)]

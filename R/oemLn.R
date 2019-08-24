@@ -1,3 +1,5 @@
+utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
+
 #' alk
 #' 
 #' @title alk
@@ -6,21 +8,19 @@
 #' @author Laurence Kell, Sea++
 #' 
 #' @name alk
-#' @param par \code{FLPar} with `linf` or  \code{numeric}
-#' @param age \code{numeric} 0:40 by default
-#' @param cv  \code{numeric} 0.2 by default
-#' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
+#' @param object \code{FLPar} with `linf` or  \code{numeric}
+#' @param ... additional arguments
+# #' @param age \code{numeric} 0:40 by default
+# #' @param cv  \code{numeric} 0.2 by default
+# #' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
 #'  
-#' @aliases
-#' 
-#' @export alk
-#' @docType method
+#' @docType methods
 #' 
 #' @rdname alk
 #' @seealso lenSample
 #' 
 #' @examples
-#' s\dontrun{
+#' \dontrun{
 #' ak=alk(FLPar(linf=50))
 #' }
 setGeneric('alk', function(object,...) standardGeneric('alk'))
@@ -58,12 +58,10 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 #' @name lenSample
 #' @param object \code{FLStock}
 #' @param alk \code{FLPar} with ALK
-#' @param nsample \code{numeric} sample size
+# #' @param nsample \code{numeric} sample size
+#' @param ... additional arguments
 #'  
-#' @aliases
-#' 
-#' @export lenSample
-#' @docType method
+#' @docType methods
 #' 
 #' @rdname lenSample
 #' @seealso setALK

@@ -1,20 +1,24 @@
+utils::globalVariables(c("ages"))
 #' gt
 #' 
 #' @title gt 
 #' 
-#' @description 
+#' @description Calculates the generation time
 #' @author Laurence Kell, Sea++
 #'  
+#' @import FLCore
+#' @import methods
+#' 
 #' @name gt
 #' @param object \code{FLBRP}
+#' @param ... other arguments
 #' 
-#' @aliases
+#' @aliases gt gt-method gt,FLBRP-method
 #' 
 #' @export gt
-#' @docType method
+#' @docType methods
 #' 
 #' @rdname gt
-#' @seealso 
 #' 
 #' @examples
 #' \dontrun{

@@ -4,14 +4,13 @@
 #' 
 #' @description create time series of summary statistics from \code{FLStock} relative to reference points
 #' @author Laurence Kell, Sea++
-#' @export omSmry  
 #' @name omSmry
 #' @param x \code{FLStock} 
-#' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
-#' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
+# #' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
+# #' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
+#' @param ... any other arguments
 #' 
-#' @export omSmry
-#' @docType method
+#' @docType methods
 #' @rdname omSmry
 #' 
 #' @seealso smryStat
@@ -20,12 +19,12 @@
 #' \dontrun{
 #' res=omSmry(om,eq)
 #' }
-setGeneric('omSmry', function(object,...) standardGeneric('omSmry'))
+setGeneric('omSmry', function(x,...) standardGeneric('omSmry'))
 
-setMethod('omSmry', signature(object="FLStock"),
-          function(object,y="missing",z=FLPar(a=0.001,b=3),...)
+setMethod('omSmry', signature(x="FLStock"),
+          function(x,y="missing",z=FLPar(a=0.001,b=3),...)
             
-            omSmryFn(object,y,z))
+            omSmryFn(x,y,z))
               
 omSmryFn<-function(x,y="missing",z=FLPar(a=0.001,b=3)){
   
@@ -82,8 +81,8 @@ omStock<-function(object){
   
   catchJuv<-function(object) apply(catch.n(object)%*%(1-mat(object))%*%catch.wt(object),2:6,sum)
   
-  res=FLQuants(object,"ssb"=FLCore:::ssb,"stock"=FLCore:::stock,"rec"=recs,"catch"=FLCore:::catch,"catchjuv"=catchJuv,
-               "fbar"=FLCore:::fbar,
+  res=FLQuants(object,"ssb"=FLCore::ssb,"stock"=FLCore::stock,"rec"=recs,"catch"=FLCore::catch,"catchjuv"=catchJuv,
+               "fbar"=FLCore::fbar,
                "swt"=swt,"cwt"=cwt,"sage"=sage,"cage"=cage)
   
   model.frame(mcf(res),drop=TRUE)}
