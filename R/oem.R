@@ -6,6 +6,8 @@ globalVariables("phaseQ")
 globalVariables("bounds")
 globalVariables("uCV")
 
+setGeneric('oem',    function(object,...)       standardGeneric('oem'))
+
 #' setGeneric('oem',    function(object,...) standardGeneric('oem'))
 #' 
 #' #' @title oem
