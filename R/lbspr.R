@@ -1,9 +1,28 @@
 utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sign.test","lm"))
 
-#'
-#' @importFrom stats lm
+#' lbspr
 #' 
-#' @export lbspr
+#' @title lbspr 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @name 
+#' @param 
+#' 
+#' @aliases
+#' 
+#' @export
+#' @docType methods
+#' 
+#' @rdname 
+#' @seealso 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' }
+
 
 lbsprFn<-function(len,params,species="",units="cm"){
   
