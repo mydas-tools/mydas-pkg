@@ -80,8 +80,8 @@ mseSRA<-function(
     #### Operating Model Projectionfor TAC
     #try(save(om,tac,sr,eq,srDev,maxF,file="/home/laurence/Desktop/test3.RData"))
     om =fwd(om,catch=tac,sr=eq,residuals=srDev,effort_max=maxF)  
-    print(plot(as(list("MP"=                     window(mp,end=iYr),
-                       "OM"=as(window(om,end=iYr+interval),"biodyn")),"biodyns")))
+    #print(plot(as(list("MP"=                     window(mp,end=iYr),
+    #                   "OM"=as(window(om,end=iYr+interval),"biodyn")),"biodyns")))
   }
   
   return(om)}
