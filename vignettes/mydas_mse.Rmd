@@ -276,10 +276,10 @@ Then the MSE can be run using the `mseXSA` function
 #source('~/Desktop/sea++/mydas/pkg/R/hcrParam.R')
 
 #save(oms,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/t.RData")
-oms["Age"]=mseXSA(oms[["Projection"]],eq, #OM
-                    mp,xsaControl,rf=rf,        #MP
-                    srDev=srDev,uDev=uDev,   #Random deviates for OM 
-                    start=75,end=103,maxF=1.0)        #year range
+oms["Age"]=mseXSA(oms[["Projection"]],eq, 
+                    mp,xsaControl,rf=rf,       
+                    srDev=srDev,uDev=uDev,   
+                    start=75,end=103,maxF=1.0)      
 ```
 
 ```{r xsa-mse-plot, echo=FALSE}
