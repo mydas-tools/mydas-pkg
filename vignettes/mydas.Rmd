@@ -15,8 +15,12 @@ PLEASE visit the tutorial on [ggplotFL: plotting FLR objects with ggplot2](http:
 
 # Download
 
-The tutorial is available in various formats:
+There are a variety of tutorials available in a number of formats:
 
-- [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing)
-- [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf)
-- [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Operating Model conditioning [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Observation Error Models [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Simulation testing [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Management Strategy Evaluation [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Summary Statistcs [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+- Parallel computing [html](https://docs.google.com/document/d/1gloIjSn4Fd73_MqfuYJdoYZNMDtixw0356ETOZsFpco/edit?usp=sharing) [pdf](http://www.flr-project.org/doc/pdf/ggplotFL_plotting_FLR_objects_with_ggplot2.pdf) [R script](http://www.flr-project.org/doc/R/ggplotFL_plotting_FLR_objects_with_ggplot2.R)
+

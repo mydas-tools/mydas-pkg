@@ -85,7 +85,7 @@ mseXSA<-function(
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.0,
   whitebox=FALSE){ 
-  
+ 
   if (dims(om)$iter==1 & dims(srDev)$iter>1) om=propagate(om,dims(srDev)$iter)
   
   ##Check last year so you dont run to the end then crash
@@ -119,7 +119,7 @@ mseXSA<-function(
   for (iYr in seq(start,end,interval)){
     #iYr=start
     cat(iYr,", ",sep="")
-
+    
     if (!(whitebox)){
       ## Observation Error, using data from last year back to the last assessment
       #sink("/dev/null")
@@ -130,7 +130,7 @@ mseXSA<-function(
       cpue=window(cpue,end=iYr-1)
       cpue[,ac(iYr-(interval:1))]=stock.n(smp)[dimnames(cpue)$age,ac(iYr-(interval:1))]%*%
         uDev[dimnames(cpue)$age,ac(iYr-(interval:1))]
-      
+
       ## Update and fill in biological parameters
       if (iYr==start) 
         mp=window(mp,end=iYr-1)
@@ -143,7 +143,7 @@ mseXSA<-function(
       #sink("/dev/null")
       mp.=trim(setPlusGroup(om[,ac(iYr-rev(seq(interval)))],pGrp),age=range(mp)["min"]:range(mp)["max"])
       #sink(NULL)
-      
+    
       ## Should really do landings and discards
       landings(   mp)[,ac(iYr-(interval:1))]=landings(   mp.)
       landings.n( mp)[,ac(iYr-(interval:1))]=landings.n( mp.)
@@ -161,11 +161,12 @@ mseXSA<-function(
       ## fit
       idx=FLIndex(index=cpue)
       range(idx)[c("startf","endf")]=c(0.01,0.1)
-
+      
       ## Bug with adding range
       xsa=FLXSA(mp,idx,control=control,diag.flag=FALSE)
       range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
       mp=mp+xsa
+     
       stock.n(mp)[is.na(stock.n(mp))]=1
     }else{
       #sink("/dev/null")
@@ -200,11 +201,11 @@ mseXSA<-function(
     mp=fwdWindow(mp,rf,end=iYr)
     
     mp[,ac(iYr)]=mp[,ac(iYr-1)]
-    
+   
     #try(save(om,mp,rf,file="/home/laurence/Desktop/tmp/mseXSA1.RData"))
-    mp=fwd(mp,catch=catch(om)[,ac(iYr)],sr=list(model="bevholt",params=params(rf)),effort_max=maxF)
+    mp=fwd(mp,catch=catch(om)[,ac(iYr)],sr=list(model="bevholt",params=params(rf)))#,effort_max=maxF)
     
-    print(plot(FLStocks(MP=mp,OM=window(om,start=dims(mp)$minyear,end=dims(mp)$maxyear))))
+    #print(plot(FLStocks(MP=mp,OM=window(om,start=dims(mp)$minyear,end=dims(mp)$maxyear))))
   
     ## HCR
     hcrPar=icesAR(rf,ftar=ftar,fmin=fmin,bpa=bpa,sigma=sigma)
@@ -219,8 +220,10 @@ mseXSA<-function(
     
     #### Operating Model update
     #try(try(save(om,eq,tac,srDev,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
-    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=srDev,effort_max=mean(maxF)) 
-  }
+
+    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=srDev)
+            #effort_max=mean(maxF)) 
+    }
   
   cat("==\n")
   

@@ -15,15 +15,17 @@ gt(object, ...)
 \item{...}{other arguments}
 }
 \description{
-Calculates the generation time
+Generation time: a measure of the distance between generations rather than the time
+taken for a population to renew itself. This may be the a mother-daughter distance, i.e. the 
+average age of mothers at birth of their daughters, or may not take sex into account at all.
 }
 \details{
 gt
 }
 \examples{
 \dontrun{
-data(pl4)
-alk=gt(FLBRP(ple4))
+data(ple4)
+gt(FLBRP(ple4))
 }
 }
 \author{

@@ -6,8 +6,8 @@
 #' @author Laurence Kell, Sea++
 #' @name omSmry
 #' @param x \code{FLStock} 
-# #' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
-# #' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
+#' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
+#' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
 #' @param ... any other arguments
 #' 
 #' @docType methods

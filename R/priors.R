@@ -1,5 +1,30 @@
 utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 
+#' priors
+#' 
+#' @title priors 
+#' 
+#' @description calculates priors
+#' @author Laurence Kell, Sea++
+#' 
+#' @name 
+#' @param 
+#' 
+#' @aliases
+#' 
+#' @export
+#' @docType methods
+#' 
+#' @rdname 
+#' @seealso 
+#' 
+#' @examples
+#' \dontrun{
+#' par=FLPar(linf=100)
+#' priors(par)
+#' }
+  
+  
 priors<-function(object,eq=lhEql(lhPar(object))){
   
   par=lhPar(object)

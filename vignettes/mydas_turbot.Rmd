@@ -1,0 +1,225 @@
+---
+title: "**FLife**"
+subtitle: "Example of Conditioning an Operating Model"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+github_document:
+  mathjax: TRUE
+pdf_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
+bibliography: refs.bib
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+---
+
+```{r knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =TRUE,
+               cache.path='cache/turbot/',
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8,
+               fig.path  ='tex/turbot-')
+
+
+iFig=0
+```
+
+
+```{r, pkgs, message=FALSE}
+library(ggplotFL)
+library(plyr)
+library(reshape)
+library(FLBRP)
+library(FLife)
+```
+
+```{r, theme, echo=FALSE}
+theme_set(theme_bw())
+options(digits=3)
+```
+
+## Install FLR packages
+
+To follow this tutorial a number of packages need to be installed, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
+
+```{r, eval=FALSE}
+install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
+             repos="http://flr-project.org/R")
+```
+
+`devtools` also needs to be installed and loaded so that the `mydas` package can be installed from the GitHub repository.
+
+```{r}
+install.packages("devtools",dependencies=TRUE)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+library(devtools)
+
+devtools::install_github("lauriekell/mydas-pkg")
+```
+
+## Load Libraries
+```{r}
+library(plyr)
+library(reshape)
+library(ggplot2)
+```
+
+```{r}
+library(FLCore)
+library(FLasher)
+library(FLBRP)
+library(FLife)
+library(mydas)
+```
+
+
+### Life history parameters
+Get fishbase data
+```{r}
+load(url("https://github.com//fishnets//fishnets//blob//master//data//fishbase-web//fishbase-web.RData?raw=True"))
+```
+
+Select turbot as a case study
+```{r}
+lh=subset(fb,species=="Psetta maxima")
+
+names(lh)[c(14,17)] = c("l50","a50")
+lh=lh[,c("linf","k","t0","a","b","a50","l50")]
+
+head(lh)
+```
+
+Get the means and create an `FLPar` object
+```{r}
+lh=apply(lh,2,mean,na.rm=T)
+lh=FLPar(lh)
+```
+
+Values can be replace with any [better estimates](https://www.researchgate.net/publication/236650425_Ecological_and_economic_trade-offs_in_the_management_of_mixed_fisheries_A_case_study_of_spawning_closures_in_flatfish_fisheries) that may be available.
+
+`lhPar` fills in missing values using life history theory, while quantities like selection-at-age are set using defaults, in this case set to be the same as maturity-at-age.  
+
+
+```{r}
+par=lhPar(lh)
+par
+```
+
+The parameters are then used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruitment relationship, by creating an [`FLBRP` object](https://www.flr-project.org/doc/Reference_points_for_fisheries_management_with_FLBRP.html)
+
+
+```{r}
+eq=lhEql(par)
+```
+
+```{r vectors, echo=FALSE, fig.height=6}
+sel<-function(x) 
+  catch.sel(x)%/%fapex(catch.sel(x))
+
+ggplot(FLQuants(eq,"m","catch.sel"=sel,"mat","catch.wt"))+
+  geom_line(aes(age,data))+
+  facet_wrap(~qname,scale="free")+
+  scale_x_continuous(limits=c(0,20))+ 
+  guides(colour=guide_legend(title="Species",title.position="top"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
+
+```{r}
+plot(eq)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
+
+To model time series the FLBRP object created by lhEql is coerced to an FLStock object and then [projected forward](https://www.flr-project.org/doc/Forecasting_on_the_Medium_Term_for_advice_using_FLasher.html)
+
+Simulate a time series that represents a stock that was originally lightly exploited, then effort is increased until the stock is overfished and then fishing pressure was reduced to recover the stock biomass to BMSY.
+
+```{r, fbar, fig.height=2}
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out = 30)[-30],
+                                              seq(2,1.0,length.out = 10),
+                                              rep(1.0,61)))[,1:105]
+plot(fbar(eq))
+```
+Coercing the FLBRP object into an FLStock
+
+```{r}
+om=as(eq,"FLStock")
+```
+
+Call `fwd()` with the stock, the target F and a stock recruitment relationship
+
+```{r, om-fwd}
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq)
+```
+
+
+```{r stock-stochastic-2, echo=FALSE}
+plot(om)+
+  geom_line(aes(year,data,col=iter),data=plot(iter(window(om,end=100),1:3))$data)+
+  theme(legend.position="none")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
+
+```{r ts}
+plot(FLQuants(om,   
+          "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
+          "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
+          "rec" = function(x) rec(x)%/%refpts( eq)["msy","rec"], 
+          "catch"=function(x) landings(x)%/%refpts(eq)["msy","yield"])) + 
+  geom_hline(aes(yintercept=1),col="red") 
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series relative to MSY benchmarks.
+
+### Stochasticity 
+Add recruitment variability into add the residuals argument, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
+
+```{r}
+nits=100
+
+srDev=rlnoise(nits, rec(om) %=% 0, 0.3)
+
+om=propagate(om,nits)
+
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq, residuals=srDev)
+```
+
+```{r}
+plot(om)
+```
+
+
+**Figure `r iFig=iFig+1; iFig`** Simulate a stock with increasing F
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLPKG: `r # packageVersion('FLPKG')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Laurence KELL**. laurie@seaplusplus.co.uk
+
+## Acknowledgements
+
+
+# References {#References}
+
+

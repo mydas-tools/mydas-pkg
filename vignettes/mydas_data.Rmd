@@ -1,0 +1,153 @@
+---
+title: "FLife"
+subtitle: "WKLIFE Life History Relationships"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Laurence Kell"
+output: rmarkdown:::pdf_document
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{FLife-WKLife}
+  %\VignetteEncoding{UTF-8}
+bibliography: refs.bib
+tags: FLPKG FLR
+license: Creative Commons Attribution-ShareAlike 4.0 International
+---
+
+
+# FLife package
+
+```{r knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =!TRUE,
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8)
+
+iFig=0
+```
+
+
+```{r, pkgs, message=FALSE}
+library(mydas)
+```
+
+```{r, theme, echo=FALSE}
+theme_set(theme_bw())
+options(digits=3)
+```
+
+# Life history parameters
+```{r, data}
+data(mydas)
+```
+
+
+```{r, fig.height=8, echo=FALSE}
+library(GGally)
+
+my_smooth <- function(data,mapping,...){
+  ggplot(data=data,mapping=mapping)+
+  geom_point(...,size=.5)+
+  geom_smooth(...,method="lm",se=FALSE)}
+
+my_density <- function(data,mapping,...){
+  ggplot(data=data,mapping=mapping)+
+  geom_density(...,lwd=1)}
+
+ggpairs(transform(wklife[,-c(1:5)],linf=log(linf),k=log(k),l50=log(l50)),
+  lower = list(continuous = wrap(my_smooth)),
+  diag=list(continuous=wrap(my_density,alpha=0.2)),
+  title = "")+
+  theme(legend.position ="none",
+  panel.grid.major =element_blank(),
+  axis.ticks       =element_blank(),
+  axis.text.x      =element_blank(),
+  axis.text.y      =element_blank(),
+  panel.border     =element_rect(linetype = 1, colour="black", fill=NA))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Pairwise scatter plots of life history parameters.
+
+
+# Equilibrium Dynamics
+
+Create an `FLPar`
+```{r FLPar}
+wkpar=as(wklife[,6:13],"FLPar")
+attributes(wkpar)[names(wklife)[1:5]]=wklife[,1:5]
+```
+
+Then use life history relationships to estimate missing values  
+```{r m-gislason}
+par <- lhPar(wkpar)
+units(par) <- c("", "", "cm", "", "cm", "cm", "cm", "cm")
+```
+
+and then to derive vectors for processses such as natural mortality 
+ 
+```{r eqls}
+eql=lhEql(par)
+```
+
+```{r vectors}
+sel<-function(x) 
+  catch.sel(x)%/%fapex(catch.sel(x))
+
+ggplot(FLQuants(eql,"m","catch.sel"=sel,"mat","catch.wt"))+
+  geom_line(aes(age,data,col=attributes(wkpar)$name[iter]))+
+  facet_wrap(~qname,scale="free")+
+  scale_x_continuous(limits=c(0,15))+ 
+  guides(colour=guide_legend(title="Species",title.position="top"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
+
+and estimate equilibrium dynamics and reference points, e.g. for lemon sole
+
+```{r eql,eval=FALSE}
+plot(iter(eql,3))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Equilibrium curves for ling.
+
+# Simulation
+
+Create a forward projection, i.e. an `FLStock` from an equilibrium object
+
+```{r eql-lmsl}
+lmsl=as(iter(eql,7),"FLStock")
+
+units(mat(lmsl))="NA"
+units(harvest(lmsl))="f"
+plot(lmsl)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Simulate a stock with increasing F
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLPKG: `r # packageVersion('FLPKG')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Laurence KELL**. laurie.kell.es
+
+
+## Acknowledgements
+
+This vignette and many of the methods documented in it were developed under the MyDas project funded by the Irish exchequer and EMFF 2014-2020. The overall aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY) reference points (or proxy MSY reference points) across the spectrum of data-limited stocks.
+
+# References {#References}
+
+

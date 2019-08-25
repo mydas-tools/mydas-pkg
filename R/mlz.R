@@ -26,7 +26,7 @@ mlz<-function(object,params,ncp=2,ss=500){
     
     dat=as.data.frame(iter(object,i))
     
-    res=mlzFn(
+    res=mydas:::mlzFn(
          year=dat$year,
          len =dat$data,
          lc  =c(iter(prior["lc"],  i)),

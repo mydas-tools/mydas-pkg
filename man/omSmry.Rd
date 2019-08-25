@@ -11,6 +11,10 @@ omSmry(x, ...)
 \item{x}{\code{FLStock}}
 
 \item{...}{any other arguments}
+
+\item{y}{\code{FLBRP} or \code{FLPar} with reference points, optional}
+
+\item{z}{\code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default}
 }
 \description{
 create time series of summary statistics from \code{FLStock} relative to reference points
