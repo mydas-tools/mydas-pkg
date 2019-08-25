@@ -84,7 +84,7 @@ mseEMPSBT1Alb<-function(
     #### Operating Model Projectionfor TAC
     #try(save(om,tac,sr,eq,srDev,maxF,file="/home/laurence/Desktop/test3.RData"))
     om =fwd(om,catch=tac,sr=eq,residuals=srDev,effort_max=maxF)  
-    print(plot(window(om,end=iYr+dim(tac)[2])))
+    #print(plot(window(om,end=iYr+dim(tac)[2])))
   }
   
   cat("\n")

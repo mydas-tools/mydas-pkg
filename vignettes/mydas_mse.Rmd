@@ -272,11 +272,11 @@ Before running the MSE, i.e. using XSA as part of a feedback control procedure, 
 Then the MSE can be run using the `mseXSA` function
 
 ```{r xsa-mse}
-#source('~/Desktop/sea++/mydas/pkg/R/mseXSA.R')
-#source('~/Desktop/sea++/mydas/pkg/R/hcrParam.R')
+source('~/Desktop/sea++/mydas/pkg/R/mseXSA.R')
+source('~/Desktop/sea++/mydas/pkg/R/hcr.R')
 
 #save(oms,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/t.RData")
-oms["Age"]=mseXSA(oms[["Projection"]],eq, 
+oms["Age"]=mseXSA(oms[["Projection"]],iter(eq,1), 
                     mp,xsaControl,rf=rf,       
                     srDev=srDev,uDev=uDev,   
                     start=75,end=103,maxF=1.0)      
