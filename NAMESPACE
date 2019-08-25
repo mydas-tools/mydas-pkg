@@ -2,6 +2,7 @@
 
 export(gt)
 export(lbsprFn)
+export(mlzFn)
 export(omSmry)
 export(priors)
 import(FLCore)

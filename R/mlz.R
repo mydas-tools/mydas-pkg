@@ -1,6 +1,26 @@
 utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","mlzFn","daply"))
 
-zFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
+
+#' mlz
+#' 
+#' @title mlz 
+#' 
+#' @description 
+#' @author Laurence Kell, Sea++
+#'  
+#' @param x 
+#' 
+#' @export
+#' @docType methods
+#' 
+#' @rdname mlz
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' }
+
+mlzFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
   
   dat=new("MLZ_data", 
           Year         =unique(year), 
@@ -26,7 +46,7 @@ mlz<-function(object,params,ncp=2,ss=500){
     
     dat=as.data.frame(iter(object,i))
     
-    res=mydas:::mlzFn(
+    res=mlzFn(
          year=dat$year,
          len =dat$data,
          lc  =c(iter(prior["lc"],  i)),
