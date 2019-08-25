@@ -12,6 +12,7 @@ utils::globalVariables(c("mlply","oem","yrRng","control","control<-","maxF.","oe
 #' @export mseEMPSBT1Alb 
 #' @docType methods
 #' 
+#' @export mseEMPSBT1Alb 
 #' @rdname mseEMPSBT1Alb 
 #' 
 #' @examples

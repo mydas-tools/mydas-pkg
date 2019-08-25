@@ -28,7 +28,8 @@ utils::globalVariables(c("FLXSA","FLBRP","brp"))
 #' @docType methods
 #' 
 #' @rdname mse
-#' 
+#'
+#' @export mseXSA 
 #' @examples
 #' \dontrun{
 #' data(pl4)

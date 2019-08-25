@@ -1,18 +1,19 @@
 #' mse
 #' 
-#' @title mse 
+#' @title mseSBTP 
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @name mse
+#' @name mseSBTP
 #' 
 #' @export mseSBTP
 #' @export hcrSBTP
 #' 
 #' @docType methods
 #' 
-#' @rdname mse
+#' @export mseSBTP
+#' @rdname mseSBTP
 #' 
 #' @examples
 #' \dontrun{

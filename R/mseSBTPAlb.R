@@ -13,6 +13,7 @@ utils::globalVariables(c("hcrSBT2"))
 #' @export mseEMPSBT2Alb
 #' @docType methods
 #' 
+#' @export mseEMPSBT2Alb
 #' @rdname mseEMPSBT2Alb
 #' 
 #' @examples

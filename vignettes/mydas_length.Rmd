@@ -65,11 +65,14 @@ library(ggplot2)
 library(plyr)
 library(reshape)
 
+library(popbio)
+
 library(FLCore)
 library(ggplotFL)
 library(FLBRP)
 library(FLasher)
 library(FLife)
+library(mydas)
 ```
 
 # Operating Model
@@ -137,9 +140,7 @@ prior=priors(lh)
 ```{r, mlz}
 library(MLZ)
 
-library(popbio)
-
-res=mlz(mnLen[,ac(40:60)],prior)
+res=mydas:::mlz(mnLen[,ac(40:60)],prior)
 
 res
 ```

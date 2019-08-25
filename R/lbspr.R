@@ -9,7 +9,6 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #'  
 #' @param x 
 #' 
-#' @export
 #' @docType methods
 #' 
 #' @rdname lbspr
