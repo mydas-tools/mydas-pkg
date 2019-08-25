@@ -7,16 +7,12 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @name 
-#' @param 
-#' 
-#' @aliases
+#' @param x 
 #' 
 #' @export
 #' @docType methods
 #' 
-#' @rdname 
-#' @seealso 
+#' @rdname lbspr
 #' 
 #' @examples
 #' \dontrun{

@@ -7,16 +7,13 @@ utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 #' @description calculates priors
 #' @author Laurence Kell, Sea++
 #' 
-#' @name 
-#' @param 
-#' 
-#' @aliases
+#' @name priors 
+#' @param x
 #' 
 #' @export priors
 #' @docType methods
 #' 
-#' @rdname 
-#' @seealso 
+#' @rdname priors
 #' 
 #' @examples
 #' \dontrun{
