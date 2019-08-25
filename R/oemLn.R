@@ -15,7 +15,8 @@ utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 # #' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
 #'  
 #' @docType methods
-#' 
+#' @export alk
+#'  
 #' @rdname alk
 #' @seealso lenSample
 #' 
