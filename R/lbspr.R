@@ -14,6 +14,8 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #' 
 #' @rdname lbspr
 #' 
+#' @export lbspr
+#' 
 #' @examples
 #' \dontrun{
 #' 

@@ -2,6 +2,7 @@
 
 export(alk)
 export(gt)
+export(lbspr)
 export(lbsprFn)
 export(lenSample)
 export(mlzFn)
