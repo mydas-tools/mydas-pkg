@@ -40,6 +40,8 @@ library(FLCore)
 library(FLBRP)
 library(FLasher)
 library(FLife)
+
+library(mydas)
 ```
 
 
@@ -190,7 +192,10 @@ The phase plot plots stock status against fishing mortality relative to target r
 
 Create an index aggregated over ages
 ```{r example1,echo=TRUE, eval=TRUE}
-apply(oem(ple4),2,sum)
+#oem<-function(x) 
+#apply(catch.wt(x)%*%catch.n(x),2,sum)%/%fbar(x)
+
+oem(ple4)
 ```
 
 

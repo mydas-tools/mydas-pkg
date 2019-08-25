@@ -30,13 +30,12 @@ utils::globalVariables(c("FLXSA","FLBRP","brp"))
 #' @rdname mse
 #'
 #' @export mseXSA 
+#' 
 #' @examples
 #' \dontrun{
 #' data(pl4)
 #' }
 #' 
-#' @export mseXSA
-
 # The ICES Advice Rule for stocks where a wide range of stock sizes 
 # has been seen so the stock recruitment relationship can be estimated
 #
