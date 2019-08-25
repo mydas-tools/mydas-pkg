@@ -361,7 +361,7 @@ ggplot()+
 
 
 ```{r, turbot-alk,echo=TRUE,eval=TRUE}
-source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
+#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
 
 library(reshape)
 lh=lhPar(FLPar(linf=89))
@@ -393,7 +393,7 @@ om=fwd(om,f=fbar(om)[,-1], sr=eq)
 ```
 
 ```{r, lfd}
-source('~/Desktop/sea++/mydas/pkg/R/oemLn.R') 
+#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R') 
 
 lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
 ```
