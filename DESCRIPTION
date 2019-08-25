@@ -13,6 +13,7 @@ Suggests:
   stats
 License: GPL (>= 2)
 Collate: 
+ oem.R
  biodyn-sra.R
  elas.R
  genTime.R
