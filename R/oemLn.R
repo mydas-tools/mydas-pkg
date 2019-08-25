@@ -64,6 +64,7 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 #'  
 #' @docType methods
 #' 
+#' @export lenSample
 #' @rdname lenSample
 #' @seealso setALK
 #' 

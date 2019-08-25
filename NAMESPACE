@@ -3,6 +3,7 @@
 export(alk)
 export(gt)
 export(lbsprFn)
+export(lenSample)
 export(mlzFn)
 export(omSmry)
 export(priors)
