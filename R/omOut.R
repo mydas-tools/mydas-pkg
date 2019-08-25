@@ -15,6 +15,8 @@
 #' 
 #' @seealso smryStat
 #' 
+#' @export omSmry
+#' 
 #' @examples
 #' \dontrun{
 #' res=omSmry(om,eq)

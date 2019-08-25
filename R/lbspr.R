@@ -3,6 +3,7 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #'
 #' @importFrom stats lm
 #' 
+#' @export lbspr
 
 lbsprFn<-function(len,params,species="",units="cm"){
   

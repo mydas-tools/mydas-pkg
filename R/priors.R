@@ -12,7 +12,7 @@ utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 #' 
 #' @aliases
 #' 
-#' @export
+#' @export priors
 #' @docType methods
 #' 
 #' @rdname 
