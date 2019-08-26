@@ -56,31 +56,31 @@ plot(FLStocks(list("xsa"=mp,"om"=om)))
 
 nits=dim(mp)[6]
 set.seed(4321)
-srDev=FLife:::rlnoise(nits,rec(    om)[,,,,,1]%=%0,0.3,b=0.0)
-uDev =FLife:::rlnoise(nits,stock.n(om)[,,,,,1]%=%0,0.2,b=0.0)
+sr_deviates=FLife:::rlnoise(nits,rec(    om)[,,,,,1]%=%0,0.3,b=0.0)
+usr_deviates =FLife:::rlnoise(nits,stock.n(om)[,,,,,1]%=%0,0.2,b=0.0)
 
 mseRay=mseXSA(om,
               eq,
               mp,control=xsaControl,
               ftar=1.0,
               interval=1,start=60,end=90,
-              srDev=srDev,uDev=uDev)
+              sr_deviates=sr_deviates,usr_deviates=usr_deviates)
 
 ##OM
 omYr=om
 set.seed(1234)
 m(omYr)=m(om)%*%rlnoise(nits,iter(m(om),1)%=%0,sd=0.0,b=0.0,what="year")
 set.seed(4321)
-srDev=FLife:::rlnoise(nits,rec(     om)[,,,,,1]%=%0,0.3,b=0.0)
+sr_deviates=FLife:::rlnoise(nits,rec(     om)[,,,,,1]%=%0,0.3,b=0.0)
 
-omYr=fwd(omYr,fbar=fbar(om)[,-1],sr=eq,residuals=srDev)
+omYr=fwd(omYr,fbar=fbar(om)[,-1],sr=eq,residuals=sr_deviates)
 
 
 omYc=om
 set.seed(1234)
 m(omYc)=m(om)%*%rlnoise(nits,iter(m(om)[1,],1)%=%0,sd=0.05,b=0.6,what="year")
 
-omYc=fwd(omYc,fbar=fbar(omYc)[,-1],sr=eq,residuals=srDev)
+omYc=fwd(omYc,fbar=fbar(omYc)[,-1],sr=eq,residuals=sr_deviates)
 
 plot(FLStocks("Year"=omYr[,,,,,c((stock(omYr)[,ac(55)]-stock(om)[,ac(55)])/stock(om)[,ac(55)])>-0.5],
               "AR"  =omYc[,,,,,c((stock(omYc)[,ac(55)]-stock(om)[,ac(55)])/stock(om)[,ac(55)])>-0.5],
@@ -91,14 +91,14 @@ mse2=mseXSA(window(omYr,start=25),
             mp,control=xsaControl,
             ftar=1.0,
             interval=1,start=50,end=80,
-            srDev=srDev,uDev=uDev)
+            sr_deviates=sr_deviates,usr_deviates=usr_deviates)
 
 mse3=mseXSA(window(omYc,start=25),
             eq,
             mp,control=xsaControl,
             ftar=1.0,
             interval=1,start=50,end=80,
-            srDev=srDev,uDev=uDev)
+            sr_deviates=sr_deviates,usr_deviates=usr_deviates)
 
 plot(FLStocks(llply(FLStocks("1"=mse1, "2"=mse2, "3"=mse3),window,start=20,end=80)))+
   facet_grid(qname~stock,scale="free")

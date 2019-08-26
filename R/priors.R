@@ -8,7 +8,9 @@ utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 #' @author Laurence Kell, Sea++
 #' 
 #' @name priors 
-#' @param x
+#' 
+#' @param object blah,blah,blah,...
+#' @param eq blah,blah,blah,...
 #' 
 #' @export priors
 #' @docType methods

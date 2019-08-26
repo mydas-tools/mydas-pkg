@@ -3,19 +3,24 @@
 \docType{methods}
 \name{lenSample}
 \alias{lenSample}
-\title{slenSample}
+\alias{lenSample-method}
+\alias{lenSample,FLQuant,FLPar,missing-method}
+\alias{lenSample,FLQuant,FLPar,numeric-method}
+\title{lenSample}
 \usage{
-lenSample(object, alk, ...)
+lenSample(object, alk, nsample, ...)
 }
 \arguments{
-\item{object}{\code{FLStock}}
+\item{object}{\code{FLStock} blah,blah,blah,...}
 
 \item{alk}{\code{FLPar} with ALK}
 
-\item{...}{additional arguments}
+\item{nsample}{\code{numeric} sample size, default is 500}
+
+\item{...}{any additional arguments}
 }
 \description{
-slenSample
+lenSample
 }
 \details{
 lenSample

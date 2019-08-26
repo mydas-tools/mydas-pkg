@@ -8,7 +8,9 @@
 priors(object, eq = lhEql(lhPar(object)))
 }
 \arguments{
-\item{x}{}
+\item{object}{blah,blah,blah,...}
+
+\item{eq}{blah,blah,blah,...}
 }
 \description{
 calculates priors

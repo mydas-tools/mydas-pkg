@@ -9,11 +9,13 @@ utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 #' 
 #' @name alk
 #' @param object \code{FLPar} with `linf` or  \code{numeric}
-#' @param ... additional arguments
+#' @param ... any additional arguments
 # #' @param age \code{numeric} 0:40 by default
 # #' @param cv  \code{numeric} 0.2 by default
 # #' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
 #'  
+#' @aliases alk alk-method alk,FLPar-method
+#' 
 #' @docType methods
 #' @export alk
 #'  
@@ -51,31 +53,41 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 
 #' lenSample
 #' 
-#' @title slenSample 
+#' @title lenSample 
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++  
 #' 
 #' @name lenSample
-#' @param object \code{FLStock}
+#' 
+#' @param object \code{FLStock} blah,blah,blah,...
 #' @param alk \code{FLPar} with ALK
-# #' @param nsample \code{numeric} sample size
-#' @param ... additional arguments
-#'  
+#' @param nsample \code{numeric} sample size, default is 500
+#' @param ... any additional arguments
+#' 
 #' @docType methods
 #' 
 #' @export lenSample
 #' @rdname lenSample
 #' @seealso setALK
 #' 
+#' @aliases lenSample  
+#'          lenSample-method  
+#'          lenSample,FLQuant,FLPar,missing-method
+#'          lenSample,FLQuant,FLPar,numeric-method
+#' 
 #' @examples
 #' \dontrun{
 #' lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],alk,nsample=100)
 #' }
-setGeneric('lenSample', function(object,alk,...) standardGeneric('lenSample'))
+setGeneric('lenSample', function(object,alk,nsample,...) standardGeneric('lenSample'))
 
-setMethod('lenSample', signature(object="FLQuant",alk="FLPar"),
+setMethod('lenSample', signature(object="FLQuant",alk="FLPar",nsample="missing"),
           function(object,alk,nsample=500,...)
+            
+            lenSampleFn(object,alk,nsample))
+setMethod('lenSample', signature(object="FLQuant",alk="FLPar",nsample="numeric"),
+          function(object,alk,nsample,...)
             
             lenSampleFn(object,alk,nsample))
 

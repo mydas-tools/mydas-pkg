@@ -6,61 +6,36 @@ utils::globalVariables(c("FLXSA","FLBRP","brp"))
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
-#'  
-#' @param om \code{FLStock} 
-#' @param eq \code{FLBRP} 
-#' @param mp \code{FLStock}
-#' @param control \code{FLXSA.control}
-#' @param rf \code{}
+#'     
+#' @param om \code{FLStock} object as the operating model
+#' @param eq \code{FLBRP}   blah,blah,blah,...
+#' @param mp \code{FLStock}  blah,blah,blah,...
+#' @param control \code{FLXSA.control}  blah,blah,blah,...
+#' @param rf \code{}  blah,blah,blah,...
 #' @param ftar \code{numeric}  default is 1.0
 #' @param fmin \code{numeric}  default is 0.05 HCR
 #' @param bpa \code{numeric}  default is 0.5 HCR
 #' @param sigma \code{numeric}  default is 0.3 HCR
-#' @param bndTac\code{numeric}  default is c(0.01,100) Bounds on TAC changes
-#' @param start  \code{numeric}  default is range(om)["maxyear"]-30
-#' @param end  \code{numeric}  default is range(om)["maxyear"]-interval
+#' @param bndTac \code{numeric}  default is c(0.01,100) Bounds on TAC changes
+#' @param start \code{numeric}  default is range(om)["maxyear"]-30
+#' @param end \code{numeric}  default is range(om)["maxyear"]-interval
 #' @param interval  \code{numeric}  default is 3 years over which to run MSE, doesnt work if interval==1, this is a bug
-#' @param srDev \code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
-#' @param uDev   \code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
+#' @param sr_deviates \code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
+#' @param u_deviates   \code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
 #' @param maxF  \code{numeric} 1.0 Capacity, i.e. F in OM can not be greater than this
 #' @param whitebox  \code{boolean} FALSE
 #' 
 #' @docType methods
 #' 
-#' @rdname mse
+#' @rdname mseXSA
 #'
 #' @export mseXSA 
+#' @import FLBRP
 #' 
 #' @examples
 #' \dontrun{
 #' data(pl4)
 #' }
-#' 
-# The ICES Advice Rule for stocks where a wide range of stock sizes 
-# has been seen so the stock recruitment relationship can be estimated
-#
-# if SSB>= MSY Btrigger
-#    F=Fmsy
-# else
-#    F=FMSY*SSB/Btrigger  
-#
-# FMSY could be a proxy for FMSY, i.e. F0.1
-#
-# Where
-#
-# Btrigger is BPA,  i.e. Blim×exp(-1.645×sigma)
-# Blim is the break point from segmented regression
-
-# http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf
-
-icesAR<-function(x,ftar=1.0,fmin=0.05,bpa=0.5,sigma=0.3){
-  
-  hcrParam(
-    ftar =refpts(x)["f0.1","harvest"]*ftar,
-    btrig=refpts(x)["f0.1",    "ssb"]*exp(-1.645*sigma),
-    fmin =refpts(x)["f0.1","harvest"]*fmin,
-    blim =refpts(x)["f0.1",    "ssb"]*bpa)}
-
 mseXSA<-function(  
   #OM as FLStock and FLBRP
   om,eq,
@@ -79,25 +54,25 @@ mseXSA<-function(
   interval=3,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Stochasticity, either by default or suppliedas args
-  srDev=rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
-  uDev =rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
+  sr_deviates=rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
+  u_deviates =rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.0,
   whitebox=FALSE){ 
  
-  if (dims(om)$iter==1 & dims(srDev)$iter>1) om=propagate(om,dims(srDev)$iter)
+  if (dims(om)$iter==1 & dims(sr_deviates)$iter>1) om=propagate(om,dims(sr_deviates)$iter)
   
   ##Check last year so you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
 
   ## Make sure number of iterations in OM are consistent
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(srDev)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
   ## Limit on capacity, add to fwd(om,maxF=maxF) so catches dont go stuoid 
-  maxF=mean(FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF,na.rm=TRUE)
+  maxF=mean(FLQuant(1,dimnames=dimnames(sr_deviates))%*%apply(fbar(window(om,end=start)),6,max)*maxF,na.rm=TRUE)
 
   ## Observation Error (OEM) setup before looping through years 
   ## this done so biology can be different from OM
@@ -108,7 +83,7 @@ mseXSA<-function(
   #sink(NULL)
 
   cpue=window(stock.n(smp),end=start-1)[seq(dim(smp)[1]-1)]
-  cpue=cpue%*%uDev[dimnames(cpue)$age,dimnames(cpue)$year]
+  cpue=cpue%*%u_deviates[dimnames(cpue)$age,dimnames(cpue)$year]
 
   ## MP, no need to add biological parameters and catch at this stage, as these are already there, 
   ## rather get rid of stuff that has to be added by OEM and stock assessment fit
@@ -129,7 +104,7 @@ mseXSA<-function(
       ## CPUE
       cpue=window(cpue,end=iYr-1)
       cpue[,ac(iYr-(interval:1))]=stock.n(smp)[dimnames(cpue)$age,ac(iYr-(interval:1))]%*%
-        uDev[dimnames(cpue)$age,ac(iYr-(interval:1))]
+        u_deviates[dimnames(cpue)$age,ac(iYr-(interval:1))]
 
       ## Update and fill in biological parameters
       if (iYr==start) 
@@ -219,13 +194,62 @@ mseXSA<-function(
     tac[is.na(tac)]=1  
     
     #### Operating Model update
-    #try(try(save(om,eq,tac,srDev,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
+    #try(try(save(om,eq,tac,sr_deviates,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
 
-    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=srDev)
+    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=sr_deviates)
             #effort_max=mean(maxF)) 
     }
   
   cat("==\n")
   
   return(om)}
+
+
+#' icesAR
+#' 
+#' @title icesAR 
+#' 
+#' @description # The ICES Advice Rule for stocks where a wide range of stock sizes has been seen 
+#' so the stock recruitment relationship can be estimated
+#'
+#' if SSB>= MSY Btrigger
+#'    F=Fmsy
+#' else
+#'    F=FMSY*SSB/Btrigger  
+#'
+#' FMSY could be a proxy for FMSY, i.e. F0.1
+#'
+#' Where
+#'   Btrigger is BPA,  i.e. Blim×exp(-1.645×sigma)
+#'   Blim is the break point from segmented regression
+#'   
+#'   # http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf
+#'   
+#' @name icesAR
+#' 
+#' @author Laurence Kell, Sea++
+#'     
+#' @param x \code{FLBRP} with reference points
+#' @param ftar default of 1.0
+#' @param fmin default of0.05
+#' @param bpa default of0.5
+#' @param sigma default of 0.3
+#' 
+#' @docType methods
+#' 
+#' @rdname icesAR
+#'
+#' @export  icesAR 
+#' 
+#' @examples
+#' \dontrun{
+#' data(pl4)
+#' }
+icesAR<-function(x,ftar=1.0,fmin=0.05,bpa=0.5,sigma=0.3){
+  
+  hcrParam(
+    ftar =refpts(x)["f0.1","harvest"]*ftar,
+    btrig=refpts(x)["f0.1",    "ssb"]*exp(-1.645*sigma),
+    fmin =refpts(x)["f0.1","harvest"]*fmin,
+    blim =refpts(x)["f0.1",    "ssb"]*bpa)}
 

@@ -3,6 +3,8 @@
 \docType{methods}
 \name{hcrICES}
 \alias{hcrICES}
+\alias{hcrICES-method}
+\alias{hcrICES,FLStock,FLBRP-method}
 \title{hcrICES}
 \usage{
 hcrICES(object,eql,sr_deviances,params, 
@@ -14,21 +16,21 @@ hcrICES(object,eql,sr_deviances,params,
 
 \item{eql}{\code{FLBRP} with a stock recruitment relationship used for projection}
 
-\item{...}{any additional arguments}
-
 \item{sr_deviances}{\code{FLQuant} recuitment deviates on the log scale, i.e. multiplicative}
 
 \item{params}{\code{FLPar} HCR parameters, specifying blim, btrig, ftar and fmin}
 
 \item{start}{\code{numeric} first year for simulation}
 
-\item{end}{\code{numeric}   last year for simukation}
+\item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
 
 \item{interval}{\code{numeric} time step, 1 year by default}
 
 \item{err}{\code{FLQuant} assessment error on SSB for year used for HCR}
 
 \item{bndTac}{\code{numeric} bounds on TAC, by default these are turned off, for 20 percent constraint set to c(0.8,1.2)}
+
+\item{...}{any additional arguments}
 }
 \value{
 returns a \code{list} with \code{FLStock} and \code{FLPar} objects for the stock and HCR

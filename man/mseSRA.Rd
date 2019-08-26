@@ -7,7 +7,32 @@
 \usage{
 mseSRA(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
   interval = 3, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, srDev, maxF = 1.5)
+  end = range(om)["maxyear"] - interval, sr_deviates, maxF = 1.5)
+}
+\arguments{
+\item{om}{\code{FLStock} object as the operating model}
+
+\item{eq}{blah,blah,blah,...}
+
+\item{mp}{blah,blah,blah,...}
+
+\item{ftar}{blah,blah,blah,...}
+
+\item{btrig}{blah,blah,blah,...}
+
+\item{fmin}{blah,blah,blah,...}
+
+\item{blim}{blah,blah,blah,...}
+
+\item{interval}{blah,blah,blah,...}
+
+\item{start}{\code{numeric}  default is range(om)["maxyear"]-30}
+
+\item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
+
+\item{sr_deviates}{blah,blah,blah,...}
+
+\item{maxF}{blah,blah,blah,...}
 }
 \description{
 mseSRA

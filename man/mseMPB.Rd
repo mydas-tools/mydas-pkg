@@ -3,24 +3,41 @@
 \docType{methods}
 \name{mseMPB}
 \alias{mseMPB}
-\alias{mpTrace}
 \alias{mseMPB-method}
 \alias{mseMPB,FLStock,FLBRP-method}
 \title{mseMPB}
 \usage{
-mpTrace(mp, par, tac)
+mseMPB(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
+  interval = 3, start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval, sr_deviates, u_deviates,
+  maxF = 1.5)
 }
 \arguments{
-\item{blim=0.3, }{}
+\item{om}{\code{FLStock} object as the operating model}
 
-\item{#years}{over which to run MSE}
+\item{eq}{blah,blah,blah,...}
 
-\item{end=range(om)["maxyear"]-interval, }{#Stochasticity}
+\item{mp}{blah,blah,blah,...}
 
-\item{srDev}{#=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),}
+\item{ftar}{1.0  blah,blah,blah,...}
 
-\item{uDev}{#=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
-#Capacity, i.e. F in OM can not be greater than this}
+\item{btrig}{0.5  blah,blah,blah,...}
+
+\item{fmin}{0.05  blah,blah,blah,...}
+
+\item{blim}{0.3  blah,blah,blah,...}
+
+\item{interval}{3  blah,blah,blah,...}
+
+\item{start}{\code{numeric}  default is range(om)["maxyear"]-30}
+
+\item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
+
+\item{sr_deviates}{rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),}
+
+\item{u_deviates}{=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),}
+
+\item{maxF}{1.5}
 }
 \description{
 mseMPB

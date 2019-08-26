@@ -1,3 +1,5 @@
+utils::globalVariables(c("refpts<-"))
+  
 #' hcrICES
 #' 
 #' @title hcrICES 
@@ -11,16 +13,16 @@
 #'          
 #' @param object an object of class \code{FLStock} 
 #' @param eql \code{FLBRP} with a stock recruitment relationship used for projection
+#' @param ... any additional arguments
 #' @param sr_deviances \code{FLQuant} recuitment deviates on the log scale, i.e. multiplicative
 #' @param params \code{FLPar} HCR parameters, specifying blim, btrig, ftar and fmin
 #' @param start \code{numeric} first year for simulation
-#' @param end \code{numeric}   last year for simukation
+#' @param end \code{numeric}  default is range(om)["maxyear"]-interval
 #' @param interval  \code{numeric} time step, 1 year by default
 #' @param err \code{FLQuant} assessment error on SSB for year used for HCR
 #' @param bndTac \code{numeric} bounds on TAC, by default these are turned off, for 20 percent constraint set to c(0.8,1.2)
-#' @param ... any additional arguments
 #' 
-# #' @aliases hcrICES hcrICES-method hcrICES,FLStock,FLBRP-method
+#' @aliases hcrICES hcrICES-method hcrICES,FLStock,FLBRP-method
 #' 
 #' @export hcrICES
 #' @docType methods
@@ -31,6 +33,8 @@
 #'
 #' @import FLCore 
 #' 
+#' @aliases hcrICES hcrICES-method  hcrICES,FLStock,FLBRP-method
+#' 
 #' @export
 #' 
 #' @examples
@@ -39,10 +43,12 @@
 #' }
 #' 
 #' 
-setGeneric('hcrICES', function(object,eql,...) standardGeneric('hcrICES'))
+#setGeneric('hcrICES', function(object,eql,...) standardGeneric('hcrICES'))
 
-setMethod('hcrICES', signature(object="FLStock",eql='FLBRP'),
-          function(object,eql,sr_deviances,params,
+#setMethod('hcrICES', signature(object="FLStock",eql='FLBRP'),
+hcrICES<-function(object,eql,
+                   sr_deviances,
+                   params,
                    start   =max(dimnames(object)$year)-10,
                    end     =start+10,
                    interval=1,
@@ -105,7 +111,7 @@ setMethod('hcrICES', signature(object="FLStock",eql='FLBRP'),
             }
             cat("==\n")
             
-            list(object,chk)})
+            list(object,chk)}
 
 hcrFn<-function(object,eql,params,
                 stkYrs=max(as.numeric(dimnames(stock(object))$year))-2,

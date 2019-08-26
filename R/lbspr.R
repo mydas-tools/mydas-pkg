@@ -4,11 +4,20 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #' 
 #' @title lbspr 
 #' 
-#' @description 
+#' @description A wrapper for LBSPR  see https://cran.r-project.org/web/packages/LBSPR/vignettes/LBSPR.html
+#'  This alloe fitting to empirical length data to provide an estimate of the spawning potential 
+#'  ratio (SPR) for use in MSE.
+#' 
 #' @author Laurence Kell, Sea++
 #'  
-#' @param x 
+#' @param object \code{data.frame} with length frequency sample
+#' @param params \code{FLPar} with values for linf, a50, ato95 and mk
+#' @param ... any additional arguments
 #' 
+#' @aliases lbspr 
+#'          lbspr-method 
+#'          lbspr,data.frame,FLPar-method
+#'          
 #' @docType methods
 #' 
 #' @rdname lbspr
@@ -17,9 +26,10 @@ utils::globalVariables(c("mdply","cast","melt","vonB","LBSPRfit","difference.sig
 #' 
 #' @examples
 #' \dontrun{
-#' 
+#' lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
+#' lb=lbspr(lfd,prior) 
 #' }
-
+setGeneric('lbspr', function(object,params,...) standardGeneric('lbspr'))
 
 lbsprFn<-function(len,params,species="",units="cm"){
   
@@ -46,7 +56,9 @@ lbsprFn<-function(len,params,species="",units="cm"){
   
   res@Ests}
 
-lbspr<-function(object,params){
+
+setMethod('lbspr', signature(object="data.frame",params='FLPar'),
+          function(object,params,...){
   
   nits=max(dim(object)[6],dim(params)[2])
   
@@ -59,4 +71,4 @@ lbspr<-function(object,params){
   
   rtn=FLPar(cast(melt(res,id=c("year","iter")),variable~year~iter),units="NA")
   
-  rtn}
+  rtn})

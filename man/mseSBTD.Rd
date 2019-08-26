@@ -5,9 +5,37 @@
 \alias{mseSBTD}
 \title{mseSBTD}
 \usage{
-mseSBTD(om, eq, control = "missing", srDev, uDev, interval = 1,
-  start = range(om)["maxyear"] - 30, end = range(om)["maxyear"] -
-  interval, nyrs = 5, cpueFn = ssb, lag = 1, maxF = 10)
+mseSBTD(om, eq, control = "missing", sr_deviates, u_deviates,
+  interval = 1, start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval, nyrs = 5, cpueFn = ssb,
+  lag = 1, maxF = 10)
+}
+\arguments{
+\item{om}{\code{FLStock} object as the operating model}
+
+\item{eq}{blah,blah,blah,...}
+
+\item{control}{blah,blah,blah,...}
+
+\item{sr_deviates}{blah,blah,blah,...}
+
+\item{u_deviates}{blah,blah,blah,...}
+
+\item{interval}{blah,blah,blah,...}
+
+\item{start}{\code{numeric}  default is range(om)["maxyear"]-30}
+
+\item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
+
+\item{nyrs}{blah,blah,blah,...}
+
+\item{cpueFn}{blah,blah,blah,...}
+
+\item{lag}{blah,blah,blah,...}
+
+\item{maxF}{blah,blah,blah,...}
+
+\item{...}{any additional arguments}
 }
 \description{
 mseSBTD

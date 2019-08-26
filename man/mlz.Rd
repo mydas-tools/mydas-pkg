@@ -8,7 +8,19 @@
 mlzFn(year, len, lc, linf, k, ncp = 2, ss = 500)
 }
 \arguments{
-\item{x}{}
+\item{year}{blah,blah,blah,...}
+
+\item{len}{blah,blah,blah,...}
+
+\item{lc}{blah,blah,blah,...}
+
+\item{linf}{v blah,blah,blah,...}
+
+\item{k}{blah,blah,blah,...}
+
+\item{ncp}{blah,blah,blah,...}
+
+\item{ss}{blah,blah,blah,...}
 }
 \description{
 mlz
@@ -18,7 +30,7 @@ mlz
 }
 \examples{
 \dontrun{
-
+res=mydas:::mlz(mnLen[,ac(40:60)],prior)
 }
 }
 \author{

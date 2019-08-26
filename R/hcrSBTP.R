@@ -1,16 +1,24 @@
-#' hcr
+#' hcrSBTP
 #' 
-#' @title hcr 
+#' @title hcrSBTP
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
-#'  
-#' @name hcr
 #' 
-#' @export hcr
+#' @param yrs  blah,blah,blah,...
+#' @param control  blah,blah,blah,...
+#' @param ref  blah,blah,blah,...
+#' @param target  blah,blah,blah,...
+#' @param cpue  blah,blah,blah,...
+#' @param catch  blah,blah,blah,...
+#' @param wt default 0.5  blah,blah,blah,...
+#'  
+#' @name hcrSBTP
+#' 
+#' @export hcrSBTP
 #' @docType methods
 #' 
-#' @rdname hcr
+#' @rdname hcrSBTP
 #' 
 #' @examples
 #' \dontrun{

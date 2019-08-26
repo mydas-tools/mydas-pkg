@@ -6,13 +6,16 @@ Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
 Depends:
   R(>= 3.6.0),
-  FLCore (>= 2.6.13)
+  FLCore (>= 2.6.13),
+  FLBRP (>= 2.5.3)
 Imports:
   methods,
 Suggests:
   stats
 License: GPL (>= 2)
 Collate: 
+ svr.R
+ data.R
  oem.R
  biodyn-sra.R
  elas.R

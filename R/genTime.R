@@ -14,7 +14,7 @@ utils::globalVariables(c("ages"))
 #' 
 #' @name gt
 #' @param object \code{FLBRP}
-#' @param ... other arguments
+#' @param ... any additional arguments
 #' 
 #' @aliases gt gt-method gt,FLBRP-method
 #' 

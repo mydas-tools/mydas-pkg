@@ -4,8 +4,8 @@
 #' Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a hockey stock harvest control rule.
 #'
 #' @param object an object of class \code{biodyn} or
-#' @param ... other parameters, i.e.
-#' refs \code{FLPar or FLBRP} object with reference points, can be missing if refpts are part of \code{object}
+#' @param ... any additional arguments
+#' @param refs \code{FLPar or FLBRP} object with reference points, can be missing if refpts are part of \code{object}
 #' params \code{FLPar} object with hockey stick HCR parameters, see hcrParam
 #' yr numeric vector with years used to values in HCR
 #' byr numeric vector with years used for bounds
@@ -19,13 +19,16 @@
 #' tacMn \code{logical} should the TACs be the average of the values returned?
 #' maxF  =2 numeric vector specifying maximum relative F
 #' 
-# #' @aliases hcr,biodyn-method
-#'
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
 #'
 #' @export
 #' @rdname hcr
 #'
+#' @aliases hcr 
+#'          hcr-method 
+#'          hcr,biodyn-method  
+#'          hcr,FLStock,FLBRP-method 
+#'          hcr,biodyn,FLPar-method
 #' @examples
 #' \dontrun{
 #' bd   =sim()
@@ -55,10 +58,10 @@ setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
                 params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
 setMethod('hcr', signature(object="biodyn",refs='FLPar'),
-  function(object,refs=hcrParam(ftar =0.70*mpb::fmsy(refs),
-                                btrig=0.80*mpb::bmsy(refs),
-                                fmin =0.01*mpb::fmsy(refs),
-                                blim =0.40*mpb::bmsy(refs)),
+  function(object,refs=hcrParam(ftar =0.70*fmsy(refs),
+                                btrig=0.80*bmsy(refs),
+                                fmin =0.01*fmsy(refs),
+                                blim =0.40*bmsy(refs)),
            params=refs,
            stkYrs=max(as.numeric(dimnames(stock(object))$year)),
            refYrs=max(as.numeric(dimnames(catch(object))$year)),

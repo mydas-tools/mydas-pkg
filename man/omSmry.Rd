@@ -3,18 +3,25 @@
 \docType{methods}
 \name{omSmry}
 \alias{omSmry}
+\alias{omSmry-method}
+\alias{omSmry,FLStock-method}
+\alias{omSmry,FLStock,missing-method}
+\alias{omSmry,FLStock,FLBRP-method}
+\alias{omSmry,FLStock,FLBRP,missing-method}
+\alias{omSmry,FLStock,FLBRP,FLPar-method}
+\alias{omSmry,FLStock,missing,missing-method}
 \title{omSmry}
 \usage{
-omSmry(x, ...)
+omSmry(x, y, z, ...)
 }
 \arguments{
-\item{x}{\code{FLStock}}
-
-\item{...}{any other arguments}
+\item{x}{\code{FLStock}  blah,blah,blah,...}
 
 \item{y}{\code{FLBRP} or \code{FLPar} with reference points, optional}
 
 \item{z}{\code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default}
+
+\item{...}{any additional arguments}
 }
 \description{
 create time series of summary statistics from \code{FLStock} relative to reference points

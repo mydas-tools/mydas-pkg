@@ -1,16 +1,20 @@
-#' hcr
+#' hcrConstantCatch
 #' 
-#' @title hcr 
+#' @title hcrConstantCatch 
 #' 
 #' @description 
-#' @author Laurence Kell, Sea++
-#'  
-#' @name hcr
+#' @author Laurence Kell, Sea++ 
 #' 
-#' @export hcr
+#' @param yrs \code{numeric} target years to take catch over
+#' @param catch an \code{FLQuant} with catch to average over by iter
+#' @param ... any additional arguments
+#'  
+#' @name hcrConstantCatch
+#' 
+#' @export hcrConstantCatch
 #' @docType methods
 #' 
-#' @rdname hcr
+#' @rdname hcrConstantCatch
 #' 
 #' @examples
 #' \dontrun{

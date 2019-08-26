@@ -1,16 +1,21 @@
-#' hcr
+#' hcrParam
 #' 
-#' @title hcr 
+#' @title hcrParam 
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @name hcr
+#' @name hcrParam 
+#'  
+#' @param ftar  blah,blah,blah,...
+#' @param btrig  blah,blah,blah,...
+#' @param fmin  blah,blah,blah,...
+#' @param blim  blah,blah,blah,...
 #' 
-#' @export hcr
+#' @export hcrParam
 #' @docType methods
 #' 
-#' @rdname hcr
+#' @rdname hcrParam
 #' 
 #' @examples
 #' \dontrun{

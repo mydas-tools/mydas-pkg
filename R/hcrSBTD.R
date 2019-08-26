@@ -1,16 +1,22 @@
 #' hcr
 #' 
-#' @title hcr 
+#' @title hcrSBTD 
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @name hcr
+#' @anme hcrSBTD  
 #' 
-#' @export hcr
+#' @param yrs  blah,blah,blah,...
+#' @param control  blah,blah,blah,...FLPar(c(k1=0.25,k2=0.25,gamma=1))
+#' @param index  blah,blah,blah,...
+#' @param catch  blah,blah,blah,...
+#' @param ... any additional arguments
+#' 
+#' @export hcrSBTD
 #' @docType methods
 #' 
-#' @rdname hcr
+#' @rdname hcrSBTD
 #' 
 #' @examples
 #' \dontrun{

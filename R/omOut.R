@@ -5,13 +5,23 @@
 #' @description create time series of summary statistics from \code{FLStock} relative to reference points
 #' @author Laurence Kell, Sea++
 #' @name omSmry
-#' @param x \code{FLStock} 
+#' @param x \code{FLStock}  blah,blah,blah,...
 #' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
 #' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
-#' @param ... any other arguments
+#' @param ... any additional arguments
 #' 
 #' @docType methods
 #' @rdname omSmry
+#'
+#' @aliases omSmry 
+#'          omSmry-method
+#'          omSmry,FLStock-method 
+#'          omSmry,FLStock,missing-method 
+#'          omSmry,FLStock,FLBRP-method
+#'          omSmry,FLStock,FLBRP,missing-method
+#'          omSmry,FLStock,FLBRP,FLPar-method
+#'          omSmry,FLStock,missing,missing-method
+#'          
 #' 
 #' @seealso smryStat
 #' 
@@ -21,13 +31,23 @@
 #' \dontrun{
 #' res=omSmry(om,eq)
 #' }
-setGeneric('omSmry', function(x,...) standardGeneric('omSmry'))
+setGeneric('omSmry', function(x,y,z,...) standardGeneric('omSmry'))
 
-setMethod('omSmry', signature(x="FLStock"),
+setMethod('omSmry', signature(x="FLStock",y="missing","z"="missing"),
           function(x,y="missing",z=FLPar(a=0.001,b=3),...)
             
             omSmryFn(x,y,z))
-              
+
+setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="missing"),
+          function(x,y=y,z=FLPar(a=0.001,b=3),...)
+            
+            omSmryFn(x,y,z))
+
+setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="FLPar"),
+          function(x,y,z,...)
+            
+            omSmryFn(x,y,z))
+
 omSmryFn<-function(x,y="missing",z=FLPar(a=0.001,b=3)){
   
   nms=c("iter","year","ssb","stock","rec","catch","catchjuv","fbar",

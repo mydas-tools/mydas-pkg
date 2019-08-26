@@ -3,6 +3,8 @@
 \docType{methods}
 \name{alk}
 \alias{alk}
+\alias{alk-method}
+\alias{alk,FLPar-method}
 \title{alk}
 \usage{
 alk(object, ...)
@@ -10,7 +12,7 @@ alk(object, ...)
 \arguments{
 \item{object}{\code{FLPar} with `linf` or  \code{numeric}}
 
-\item{...}{additional arguments}
+\item{...}{any additional arguments}
 }
 \description{
 alk

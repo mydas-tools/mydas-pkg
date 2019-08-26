@@ -1,6 +1,5 @@
 utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","mlzFn","daply"))
 
-
 #' mlz
 #' 
 #' @title mlz 
@@ -8,7 +7,13 @@ utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","ml
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @param x 
+#' @param year blah,blah,blah,...
+#' @param len blah,blah,blah,...
+#' @param lc blah,blah,blah,...
+#' @param linf v blah,blah,blah,...
+#' @param k blah,blah,blah,...
+#' @param ncp blah,blah,blah,...
+#' @param ss blah,blah,blah,...
 #' 
 #' @export
 #' @docType methods
@@ -17,7 +22,7 @@ utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","ml
 #' 
 #' @examples
 #' \dontrun{
-#' 
+#' res=mydas:::mlz(mnLen[,ac(40:60)],prior)
 #' }
 
 mlzFn<-function(year,len,lc,linf,k,ncp=2,ss=500){

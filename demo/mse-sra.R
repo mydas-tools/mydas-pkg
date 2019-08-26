@@ -12,13 +12,6 @@ library(mpb)
 
 mseStart=c("brill"=54,"turbot"=54,"ray"=60,"pollack"=56,"sprat"=52,"razor"=54,"lobster"=57)
 
-#source('~/Desktop/flr/mpb/R/mseMPB.R')
-#source("/home/laurence/Desktop/flr/mpb/R/hcr.R")
-#source('~/Desktop/flr/mpb/R/mseSRA.R')
-#source('~/Desktop/flr/mpb/R/biodyn-sra.R')
-#source('~/Desktop/flr/FLife/R/omOut.R')
-
-
 theme_set(theme_bw())
 
 dirMy ="/home/laurence/Desktop/sea++/mydas/tasks/task4"
@@ -30,19 +23,19 @@ load(file.path(dirDat,"turbot.RData"))
 om=FLCore:::iter(window(om,start=20,end=90),1:500)
 
 ## MP
-mp=mpb:::setMP(as(window(om,end=55),"biodyn"),
+mp=setMP(as(window(om,end=55),"biodyn"),
          r =median(prior["r"],na.rm=T),
          k =median(prior["v"],na.rm=T),
          b0=0.8,
-         p =median(mpb:::p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
+         p =median(p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
 
 nits=dims(om)$iter
 set.seed(1234)
- srDev=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+ sr_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
 
 eq=FLCore:::iter(eq,seq(nits))
 
-#mse=mseSRA(om,eq,mp,start=55,ftar=0.5,srDev=srDev)
+#mse=mseSRA(om,eq,mp,start=55,ftar=0.5,sr_deviates=sr_deviates)
 
 scen=expand.grid(stock=c("turbot","lobster","ray","pollack","razor","brill","sprat"),
                   ftar =c(1.0,0.7),
@@ -56,20 +49,20 @@ runMPB<-function(stock,ftar,btrig) {
   eq=FLCore:::iter(eq,seq(nits))
   
   set.seed(1234)
-  srDev =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
-  uDev  =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
-  selDev=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
+  sr_deviates =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+  u_deviates  =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
+  sel_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
 
-  mp=mpb:::setMP(as(window(om,end=55),"biodyn"),
+  mp=setMP(as(window(om,end=55),"biodyn"),
                  r =median(prior["r"],na.rm=T),
                  k =median(prior["v"],na.rm=T),
                  b0=0.8,
-                 p =median(mpb:::p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
+                 p =median(p(prior["bmsy"]/prior["v"]),na.rm=TRUE))
   
   res=mseSRA(om,eq,mp,
               start=mseStart[stock],end=mseStart[stock]+40,
               ftar=ftar,btrig=btrig,
-              srDev=srDev)
+              sr_deviates=sr_deviates)
   
   res2=data.frame("stock"=stock,"ftar"=ftar,"btrig"=btrig,omSmry(res,eq,lh[c("a","b")]))
   

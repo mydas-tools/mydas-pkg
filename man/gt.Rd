@@ -12,7 +12,7 @@ gt(object, ...)
 \arguments{
 \item{object}{\code{FLBRP}}
 
-\item{...}{other arguments}
+\item{...}{any additional arguments}
 }
 \description{
 Generation time: a measure of the distance between generations rather than the time

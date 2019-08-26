@@ -2,19 +2,27 @@ utils::globalVariables(c("data","iaF","laply","loess","resc","year","coefficient
 
 #http://www.ices.dk/sites/pub/Publication%20Reports/Expert%20Group%20Report/acom/2017/WKMSYCAT34/01.%20WKMSYCAT34%20REPORT%202017.pdf
 
-#' hcr
+#' hcr2o3
 #' 
-#' @title hcr 
+#' @title hcr2o3 
 #' 
 #' @description 
 #' @author Laurence Kell, Sea++
 #'  
-#' @name hcr
-#' #' 
-#' @export hcr
+#' @name hcr2o3
+#' 
+#' 
+#' @param yrs blah,blah,blah,...
+#' @param catch  blah,blah,blah,...
+#' @param index  blah,blah,blah,...
+#' @param fproxy 1  blah,blah,blah,...
+#' @param bproxy 1 blah,blah,blah,...
+#' @param rule  c("2o3","slope","loess")
+#' 
+#' @export hcr2o3
 #' @docType methods
 #' 
-#' @rdname hcr
+#' @rdname hcr2o3
 #' 
 #' @examples
 #' \dontrun{

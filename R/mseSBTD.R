@@ -7,6 +7,20 @@
 #'  
 #' @name mseSBTD
 #' 
+#' @param om \code{FLStock} object as the operating model
+#' @param eq blah,blah,blah,...
+#' @param control blah,blah,blah,...
+#' @param nyrs blah,blah,blah,...
+#' @param cpueFn blah,blah,blah,...
+#' @param lag blah,blah,blah,...
+#' @param sr_deviates blah,blah,blah,...
+#' @param u_deviates blah,blah,blah,...
+#' @param start \code{numeric}  default is range(om)["maxyear"]-30
+#' @param end \code{numeric}  default is range(om)["maxyear"]-interval
+#' @param interval blah,blah,blah,...
+#' @param maxF blah,blah,blah,...
+#' @param ... any additional arguments
+#' 
 #' @export mseSBTD
 #' @docType methods
 #' 
@@ -24,8 +38,8 @@ mseSBTD<-function(
   #MP
   control="missing",
   
-  srDev,
-  uDev,
+  sr_deviates,
+  u_deviates,
   
   #years over which to run MSE, doesnt work if interval==1, this is a bug
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
@@ -40,13 +54,13 @@ mseSBTD<-function(
   end=min(end,range(om)["maxyear"]-interval)
   
   ## Make sure number of iterations are consistent
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(srDev)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
   ## Observation Error (OEM) setup
   cpue=window(cpueFn(om),end=start)
-  cpue=cpue%*%uDev[,dimnames(cpue)$year]
+  cpue=cpue%*%u_deviates[,dimnames(cpue)$year]
 
   ## Loop round years
   cat('\n==')
@@ -57,7 +71,7 @@ mseSBTD<-function(
     ## CPUE
     cpue=window(cpue,end=iYr-lag)
     uYrs=rev(seq(nyrs))-1+lag
-    cpue[,ac(iYr-uYrs)]=(cpueFn(om))[,ac(iYr-uYrs)]%*%uDev[,ac(iYr-uYrs)]
+    cpue[,ac(iYr-uYrs)]=(cpueFn(om))[,ac(iYr-uYrs)]%*%u_deviates[,ac(iYr-uYrs)]
 
     #### Management Procedure
     ##Constant catch
@@ -68,7 +82,7 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-rev(seq(interval))+1)])
    
     #### Operating Model update
-    om=fwd(om,catch=tac,sr=eq,residual=srDev,maxF=maxF)
+    om=fwd(om,catch=tac,sr=eq,residual=sr_deviates,maxF=maxF)
     }
   cat('==\n')
   

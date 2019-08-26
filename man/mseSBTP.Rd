@@ -5,10 +5,40 @@
 \alias{mseSBTP}
 \title{mseSBTP}
 \usage{
-mseSBTP(om, eq, srDev, uDev, interval = 1, start = range(om)["maxyear"]
-  - 30, end = range(om)["maxyear"] - interval, control = c(k1 = 0.25,
-  k2 = 0.25), yrU = 1:2, yrCatch = seq(interval) - 1,
-  refU = "missing", refCatch = "missing", maxF = 1.5)
+mseSBTP(om, eq, sr_deviates, u_deviates, interval = 1,
+  start = range(om)["maxyear"] - 30, end = range(om)["maxyear"] -
+  interval, control = c(k1 = 0.25, k2 = 0.25), yrU = 1:2,
+  yrCatch = seq(interval) - 1, refU = "missing",
+  refCatch = "missing", maxF = 1.5)
+}
+\arguments{
+\item{om}{\code{FLStock} object as the operating model}
+
+\item{eq}{blah,blah,blah,...}
+
+\item{sr_deviates}{blah,blah,blah,...}
+
+\item{u_deviates}{blah,blah,blah,...}
+
+\item{interval}{blah,blah,blah,...}
+
+\item{start}{\code{numeric}  default is range(om)["maxyear"]-30}
+
+\item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
+
+\item{control}{blah,blah,blah,...}
+
+\item{yrU}{blah,blah,blah,...}
+
+\item{yrCatch}{blah,blah,blah,...}
+
+\item{refU}{blah,blah,blah,...}
+
+\item{refCatch}{blah,blah,blah,...}
+
+\item{maxF}{blah,blah,blah,...}
+
+\item{...}{any additional arguments}
 }
 \description{
 mseSBTP
