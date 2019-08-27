@@ -9,7 +9,7 @@
 \usage{
 mseMPB(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
   interval = 3, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, sr_deviates, u_deviates,
+  end = range(om)["maxyear"] - interval, sr_deviances, u_deviances,
   maxF = 1.5)
 }
 \arguments{
@@ -33,9 +33,9 @@ mseMPB(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
 
 \item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
 
-\item{sr_deviates}{rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),}
+\item{sr_deviances}{rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),}
 
-\item{u_deviates}{=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),}
+\item{u_deviances}{=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),}
 
 \item{maxF}{1.5}
 }

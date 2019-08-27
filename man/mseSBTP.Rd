@@ -5,7 +5,7 @@
 \alias{mseSBTP}
 \title{mseSBTP}
 \usage{
-mseSBTP(om, eq, sr_deviates, u_deviates, interval = 1,
+mseSBTP(om, eq, sr_deviances, u_deviances, interval = 1,
   start = range(om)["maxyear"] - 30, end = range(om)["maxyear"] -
   interval, control = c(k1 = 0.25, k2 = 0.25), yrU = 1:2,
   yrCatch = seq(interval) - 1, refU = "missing",
@@ -16,9 +16,9 @@ mseSBTP(om, eq, sr_deviates, u_deviates, interval = 1,
 
 \item{eq}{blah,blah,blah,...}
 
-\item{sr_deviates}{blah,blah,blah,...}
+\item{sr_deviances}{blah,blah,blah,...}
 
-\item{u_deviates}{blah,blah,blah,...}
+\item{u_deviances}{blah,blah,blah,...}
 
 \item{interval}{blah,blah,blah,...}
 

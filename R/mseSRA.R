@@ -19,7 +19,7 @@ utils::globalVariables(c("sra"))
 #' @param interval blah,blah,blah,...
 #' @param start \code{numeric}  default is range(om)["maxyear"]-30
 #' @param end \code{numeric}  default is range(om)["maxyear"]-interval
-#' @param sr_deviates blah,blah,blah,...
+#' @param sr_deviances blah,blah,blah,...
 #' @param maxF blah,blah,blah,...
 #' 
 #' @export mseSRA
@@ -45,13 +45,13 @@ mseSRA<-function(
   interval=3,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Stochasticity
-  sr_deviates, #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
+  sr_deviances, #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
 
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.5){ 
   
   ## Get number of iterations in OM
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
@@ -91,8 +91,8 @@ mseSRA<-function(
     tac[is.na(tac)]=1
     
     #### Operating Model Projectionfor TAC
-    #try(save(om,tac,sr,eq,sr_deviates,maxF,file="/home/laurence/Desktop/test3.RData"))
-    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviates,effort_max=maxF)  
+    #try(save(om,tac,sr,eq,sr_deviances,maxF,file="/home/laurence/Desktop/test3.RData"))
+    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviances,effort_max=maxF)  
     #print(plot(as(list("MP"=                     window(mp,end=iYr),
     #                   "OM"=as(window(om,end=iYr+interval),"biodyn")),"biodyns")))
   }

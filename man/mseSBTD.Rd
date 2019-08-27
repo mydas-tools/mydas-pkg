@@ -5,7 +5,7 @@
 \alias{mseSBTD}
 \title{mseSBTD}
 \usage{
-mseSBTD(om, eq, control = "missing", sr_deviates, u_deviates,
+mseSBTD(om, eq, control = "missing", sr_deviances, u_deviances,
   interval = 1, start = range(om)["maxyear"] - 30,
   end = range(om)["maxyear"] - interval, nyrs = 5, cpueFn = ssb,
   lag = 1, maxF = 10)
@@ -17,9 +17,9 @@ mseSBTD(om, eq, control = "missing", sr_deviates, u_deviates,
 
 \item{control}{blah,blah,blah,...}
 
-\item{sr_deviates}{blah,blah,blah,...}
+\item{sr_deviances}{blah,blah,blah,...}
 
-\item{u_deviates}{blah,blah,blah,...}
+\item{u_deviances}{blah,blah,blah,...}
 
 \item{interval}{blah,blah,blah,...}
 

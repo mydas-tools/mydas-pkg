@@ -20,8 +20,8 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 #' @param btrig 0.5  blah,blah,blah,...
 #' @param fmin 0.05  blah,blah,blah,...
 #' @param blim 0.3  blah,blah,blah,...      
-#' @param sr_deviates rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
-#' @param u_deviates  =rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
+#' @param sr_deviances rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
+#' @param u_deviances  =rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
 #' @param interval 3  blah,blah,blah,...
 #' @param start \code{numeric}  default is range(om)["maxyear"]-30
 #' @param end \code{numeric}  default is range(om)["maxyear"]-interval
@@ -49,14 +49,14 @@ mseMPB<-function(
   interval=3,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Stochasticity
-  sr_deviates, #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
-  u_deviates,  #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
+  sr_deviances, #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3),
+  u_deviances,  #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.2),
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.5){ 
   
   ## Get number of iterations in OM
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
@@ -67,7 +67,7 @@ mseMPB<-function(
   
   #### Observation Error (OEM) setup 
   cpue=window(catch(om)%/%fbar(om),end=start)
-  cpue=cpue%*%u_deviates[,dimnames(cpue)$year]
+  cpue=cpue%*%u_deviances[,dimnames(cpue)$year]
   
   ## Loop round years
   for (iYr in seq(start,end-interval,interval)){
@@ -80,13 +80,13 @@ mseMPB<-function(
     
     cpue=window(cpue,end=iYr-1)
     cpue[,ac(iYr-(interval:1))]=catch(om)[, ac(iYr-(interval:1))]%*%
-      u_deviates[      ,ac(iYr-(interval:1))]%/%
+      u_deviances[      ,ac(iYr-(interval:1))]%/%
       fbar( om)[ ,ac(iYr-(interval:1))]
     #### Management Procedure
     mp@indices=FLQuants("1"=apply(window(cpue,start=range(mp)["minyear"]),c(2,6),sum))
     
     ##MP
-    mp@control["sigma1","val"]=cv(u_deviates)
+    mp@control["sigma1","val"]=cv(u_deviances)
     mp=fit(mp)
     mp=window(mp,end=iYr)
     
@@ -108,8 +108,8 @@ mseMPB<-function(
     tac[is.na(tac)]=1
     
     #### Operating Model Projectionfor TAC
-    #try(save(om,tac,sr,eq,sr_deviates,maxF,file="/home/laurence/Desktop/test3.RData"))
-    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviates,effort_max=maxF)  
+    #try(save(om,tac,sr,eq,sr_deviances,maxF,file="/home/laurence/Desktop/test3.RData"))
+    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviances,effort_max=maxF)  
     #print(plot(as(list("MP"=                     window(mp,end=iYr),
     #                   "OM"=as(window(om,end=iYr+interval),"biodyn")),"biodyns")))
   }
@@ -149,18 +149,18 @@ mseMPB2<-function(
   interval=3,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Stochasticity
-  sr_deviates,   #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(                     year=start:end)), sr_deviates),
-  u_deviates,    #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(                     year=start:end)),  u_deviates),
-  sel_deviates,  #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(age=dimnames(om)$age,year=start:end)),Sel_deviates),
+  sr_deviances,   #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(                     year=start:end)), sr_deviances),
+  u_deviances,    #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(                     year=start:end)),  u_deviances),
+  sel_deviances,  #=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(age=dimnames(om)$age,year=start:end)),Sel_deviances),
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.5){ 
   
-  if ("FLQuant"%in%is(  u_deviates)) u_deviates  =FLQuants(u_deviates)
-  if ("FLQuant"%in%is(sel_deviates)) sel_deviates=FLQuants(sel_deviates)
+  if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
+  if ("FLQuant"%in%is(sel_deviances)) sel_deviances=FLQuants(sel_deviances)
   
   ## Get number of iterations in OM
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
@@ -170,14 +170,14 @@ mseMPB2<-function(
   maxF=median(apply(fbar(window(om,end=start)),6,max)*maxF)
 
   #### Observation Error (OEM) setup
-  nU=max(length(u_deviates),length(sel_deviates))
+  nU=max(length(u_deviances),length(sel_deviances))
   cpue=FLQuants()
   for (iU in seq(nU)){
-    yrs=dimnames(window(sel_deviates[[iU]],end=min(start,dims(sel_deviates[[iU]])$maxyear)))$year
-    yrs=yrs[yrs%in%dimnames(u_deviates[[iU]])$year]
+    yrs=dimnames(window(sel_deviances[[iU]],end=min(start,dims(sel_deviances[[iU]])$maxyear)))$year
+    yrs=yrs[yrs%in%dimnames(u_deviances[[iU]])$year]
     yrs=yrs[yrs%in%dimnames(m(om))$year]
-    u         =catch.wt(om)[,yrs]%*%catch.n(om)[,yrs]%/%fbar(om)[,yrs]%*%sel_deviates[[iU]][,yrs]
-    cpue[[iU]]=apply(u,2:6,sum)%*%u_deviates[[iU]][,yrs]}
+    u         =catch.wt(om)[,yrs]%*%catch.n(om)[,yrs]%/%fbar(om)[,yrs]%*%sel_deviances[[iU]][,yrs]
+    cpue[[iU]]=apply(u,2:6,sum)%*%u_deviances[[iU]][,yrs]}
     
   ## Loop round years
   cat("==")
@@ -191,12 +191,12 @@ mseMPB2<-function(
 
     for (iU in seq(nU)){
       yrs=ac(iYr-(interval:1))
-      yrs=yrs[yrs%in%dimnames(u_deviates[[iU]])$year]
-      yrs=yrs[yrs%in%dimnames(sel_deviates[[iU]])$year]
+      yrs=yrs[yrs%in%dimnames(u_deviances[[iU]])$year]
+      yrs=yrs[yrs%in%dimnames(sel_deviances[[iU]])$year]
       if (length(yrs)>0){
         cpue[[iU]]=window(cpue[[iU]],end=iYr-1)
-        u         =(catch.wt(om)[,yrs]%*%catch.n(om)[,yrs]%/%fbar(om)[,yrs])%*%sel_deviates[[iU]][,yrs]
-        cpue[[iU]][,yrs]=apply(u,2:6,sum)%*%u_deviates[[iU]][,yrs]}}
+        u         =(catch.wt(om)[,yrs]%*%catch.n(om)[,yrs]%/%fbar(om)[,yrs])%*%sel_deviances[[iU]][,yrs]
+        cpue[[iU]][,yrs]=apply(u,2:6,sum)%*%u_deviances[[iU]][,yrs]}}
 
     #### Management Procedure
     params(    mp)=params( mp)[c("r","k","p","b0")]
@@ -226,8 +226,8 @@ mseMPB2<-function(
     tac[is.na(tac)]=1
     
     #### Operating Model Projectionfor TAC
-    #try(save(om,tac,sr,eq,sr_deviates,maxF,file="/home/laurence/Desktop/test3.RData"))
-    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviates)#,effort_max=maxF)  
+    #try(save(om,tac,sr,eq,sr_deviances,maxF,file="/home/laurence/Desktop/test3.RData"))
+    om =fwd(om,catch=tac,sr=eq,residuals=sr_deviances)#,effort_max=maxF)  
     #print(plot(as(list("MP"=                     window(mp,end=iYr),
     #                   "OM"=as(window(om,end=iYr+interval),"biodyn")),"biodyns")))
   }
@@ -253,14 +253,14 @@ mseAlbn<-function(
   start=range(om)["maxyear"]-30,interval=3,end=range(om)["maxyear"]-interval,
   
   #Stochasticity
-  sr_deviates=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3), 
-  u_deviates =rlnorm(dim(om)[6],FLQuant(0,dimnames=dimnames(iter(stock(om),1))),0.3),
+  sr_deviances=rlnorm(dim(om)[6],FLQuant(0,dimnames=list(year=start:end)),0.3), 
+  u_deviances =rlnorm(dim(om)[6],FLQuant(0,dimnames=dimnames(iter(stock(om),1))),0.3),
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.5){ 
   
   ## Get number of iterations in OM
-  nits=c(om=dims(om)$iter, eql=dims(params(eql))$iter, rsdl=dims(sr_deviates)$iter)
+  nits=c(om=dims(om)$iter, eql=dims(params(eql))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
@@ -268,7 +268,7 @@ mseAlbn<-function(
   cpue=FLQuants(mlply(seq(length(saa)), function(i){
     res=window(apply(oem(om,saa[[i]]),2,sum),
               start=rng[i,"minyear"],end=min(yrRng[i,"maxyear"],start))
-    res%*%u_deviates[[i]][,dimnames(res)$year]
+    res%*%u_deviances[[i]][,dimnames(res)$year]
     }))
   
   ## SA
@@ -283,7 +283,7 @@ mseAlbn<-function(
   control(mp)[substr(dimnames(control(mp))$params,1,1)=="q",1]=1
   
   ## Cut in capacity
-  maxF=FLQuant(1,dimnames=dimnames(sr_deviates))%*%apply(fbar(window(om,end=start)),6,max)*maxF
+  maxF=FLQuant(1,dimnames=dimnames(sr_deviances))%*%apply(fbar(window(om,end=start)),6,max)*maxF
 
   ## Loop round years
   for (iYr in seq(start,end-interval,interval)){
@@ -297,7 +297,7 @@ mseAlbn<-function(
     cpue=FLQuants(llply(cpue,window,end=iYr-1))
     for (i in seq(length(cpue))){
       res=window(apply(oem(om,saa[[i]]),2,sum),start=iYr-interval,end=iYr-1)
-      cpue[[i]][,ac(iYr-interval:1)]=res%*%u_deviates[[i]][,ac(iYr-interval:1)]}
+      cpue[[i]][,ac(iYr-interval:1)]=res%*%u_deviances[[i]][,ac(iYr-interval:1)]}
     
     ##MP
     params(mp)["r"]=0.3
@@ -315,7 +315,7 @@ mseAlbn<-function(
     tac=hcr(mp,params=par,hcrYrs=iYr+seq(interval),tac=TRUE)
     
     #### Operating Model Projectionfor TAC
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=sr_deviates,maxF=mean(maxF))  
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=sr_deviances,maxF=mean(maxF))  
     }
   
   return(om)}

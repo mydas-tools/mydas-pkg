@@ -272,13 +272,11 @@ Before running the MSE, i.e. using XSA as part of a feedback control procedure, 
 Then the MSE can be run using the `mseXSA` function
 
 ```{r xsa-mse}
-source('~/Desktop/sea++/mydas/pkg/R/mseXSA.R')
-source('~/Desktop/sea++/mydas/pkg/R/hcr.R')
-
+library(mydas)
 #save(oms,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/t.RData")
 oms["Age"]=mseXSA(oms[["Projection"]],iter(eq,1), 
                     mp,xsaControl,rf=rf,       
-                    srDev=srDev,uDev=uDev,   
+                    sr_deviances=srDev,u_deviances=uDev,   
                     start=75,end=103,maxF=1.0)      
 ```
 
@@ -350,7 +348,8 @@ selDev=rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(    m(om),1))),0.2,b=0.0)
 
 eq=FLCore::iter(eq,seq(nits))
 
-oms["Biomass"]=mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,srDev=srDev,uDev=uDev,selDev=selDev)
+oms["Biomass"]=mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,sr_deviances=srDev,
+                       u_deviances=uDev,sel_deviances=selDev)
 ```
   
 ```{r biodyn-mse-plot, echo=FALSE}
@@ -373,7 +372,7 @@ source("/home/laurence/Desktop/sea++/mydas/pkg/R/hcrSBTD.R")
 source("/home/laurence/Desktop/sea++/mydas/pkg/R/mseSBTD.R")
 control=FLPar(k1=0.5,k2=0.5,gamma=1)
 oms["Emprirical"]=mseSBTD(om,eq,control=control,
-                            srDev=srDev,uDev=uDev,
+                            sr_deviances=srDev,u_deviances=uDev,
                             start=75,end=100)
 ```
 

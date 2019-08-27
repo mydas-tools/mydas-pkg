@@ -1,5 +1,5 @@
 ---
-title: "**FLife**"
+title: "**mydas**"
 subtitle: "Conditioning Operating Models on Data"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:

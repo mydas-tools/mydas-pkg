@@ -13,8 +13,8 @@
 #' @param nyrs blah,blah,blah,...
 #' @param cpueFn blah,blah,blah,...
 #' @param lag blah,blah,blah,...
-#' @param sr_deviates blah,blah,blah,...
-#' @param u_deviates blah,blah,blah,...
+#' @param sr_deviances blah,blah,blah,...
+#' @param u_deviances blah,blah,blah,...
 #' @param start \code{numeric}  default is range(om)["maxyear"]-30
 #' @param end \code{numeric}  default is range(om)["maxyear"]-interval
 #' @param interval blah,blah,blah,...
@@ -38,8 +38,8 @@ mseSBTD<-function(
   #MP
   control="missing",
   
-  sr_deviates,
-  u_deviates,
+  sr_deviances,
+  u_deviances,
   
   #years over which to run MSE, doesnt work if interval==1, this is a bug
   interval=1,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
@@ -54,13 +54,13 @@ mseSBTD<-function(
   end=min(end,range(om)["maxyear"]-interval)
   
   ## Make sure number of iterations are consistent
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviates)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
   ## Observation Error (OEM) setup
   cpue=window(cpueFn(om),end=start)
-  cpue=cpue%*%u_deviates[,dimnames(cpue)$year]
+  cpue=cpue%*%u_deviances[,dimnames(cpue)$year]
 
   ## Loop round years
   cat('\n==')
@@ -71,7 +71,7 @@ mseSBTD<-function(
     ## CPUE
     cpue=window(cpue,end=iYr-lag)
     uYrs=rev(seq(nyrs))-1+lag
-    cpue[,ac(iYr-uYrs)]=(cpueFn(om))[,ac(iYr-uYrs)]%*%u_deviates[,ac(iYr-uYrs)]
+    cpue[,ac(iYr-uYrs)]=(cpueFn(om))[,ac(iYr-uYrs)]%*%u_deviances[,ac(iYr-uYrs)]
 
     #### Management Procedure
     ##Constant catch
@@ -82,7 +82,7 @@ mseSBTD<-function(
                 catch(om)[,ac(iYr-rev(seq(interval))+1)])
    
     #### Operating Model update
-    om=fwd(om,catch=tac,sr=eq,residual=sr_deviates,maxF=maxF)
+    om=fwd(om,catch=tac,sr=eq,residual=sr_deviances,maxF=maxF)
     }
   cat('==\n')
   

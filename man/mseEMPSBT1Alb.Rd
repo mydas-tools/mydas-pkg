@@ -7,8 +7,8 @@
 \usage{
 mseEMPSBT1Alb(om, eq, control = c(k1 = 2.5, k2 = 2.5, gamma = 1),
   interval = 3, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, sr_deviates, u_deviates,
-  sel_deviates, maxF = 1.5)
+  end = range(om)["maxyear"] - interval, sr_deviances, u_deviances,
+  sel_deviances, maxF = 1.5)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}
@@ -23,11 +23,11 @@ mseEMPSBT1Alb(om, eq, control = c(k1 = 2.5, k2 = 2.5, gamma = 1),
 
 \item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
 
-\item{sr_deviates}{blah,blah,blah,...}
+\item{sr_deviances}{blah,blah,blah,...}
 
-\item{u_deviates}{blah,blah,blah,...}
+\item{u_deviances}{blah,blah,blah,...}
 
-\item{sel_deviates}{blah,blah,blah,...}
+\item{sel_deviances}{blah,blah,blah,...}
 
 \item{maxF}{blah,blah,blah,...}
 }
