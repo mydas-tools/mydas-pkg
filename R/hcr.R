@@ -26,7 +26,6 @@
 #'
 #' @aliases hcr 
 #'          hcr-method 
-#'          hcr,biodyn-method  
 #'          hcr,FLStock,FLBRP-method 
 #'          hcr,biodyn,FLPar-method
 #' @examples
@@ -56,6 +55,7 @@ setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
           ...)
   hcrFn(object,refs,
                 params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
+
 
 setMethod('hcr', signature(object="biodyn",refs='FLPar'),
   function(object,refs=hcrParam(ftar =0.70*fmsy(refs),
@@ -87,25 +87,25 @@ hcrFn<-function(object,refs,
                bndTac=NULL, 
                maxF  =2,
                ...) {
-  
+print("hcr1")  
   ## HCR
   dimnames(params)$params=tolower(dimnames(params)$params)
   params=as(params,'FLQuant')  
   params["blim"]=c(qmax(params["blim"],1))
-  
+print("hcr2")    
   #if (blim>=btrig) stop('btrig must be greater than blim')
   a=(params['ftar']-params['fmin'])/(params['btrig']-params['blim'])
   b=params['ftar']-a*params['btrig']
-
+print("hcr3")  
   ## Calc F
-  # bug 
+  # bug 3
   #val=(SSB%*%a) %+% b
   # bug stock for biomass
   stk=FLCore::apply(stock(object)[,ac(stkYrs)],6,mean)
-
+print("hcr4")  
   rtn=(stk%*%a)  
   rtn=FLCore::sweep(rtn,2:6,b,'+')
-
+print("hcr5")  
   fmin=as(params['fmin'],'FLQuant')
   ftar=as(params['ftar'],'FLQuant')
   for (i in seq(dims(object)$iter)){
@@ -113,10 +113,10 @@ hcrFn<-function(object,refs,
     FLCore::iter(rtn,i)[]=min(FLCore::iter(rtn,i),FLCore::iter(ftar,i))} 
   rtn=window(rtn,end=max(hcrYrs))
   #dimnames(rtn)$year=min(hcrYrs)  
-
+print("hcr6")  
   rtn=window(rtn,end=max(hcrYrs))
   rtn[,ac(hcrYrs)]=rtn[,dimnames(rtn)$year[1]]
-  
+print("hcr7")    
   ### Bounds ##################################################################################
   ## F
   if (!is.null(bndF)){  
@@ -135,7 +135,7 @@ hcrFn<-function(object,refs,
         
         if (!is.null(maxF)) rtn=qmin(rtn,maxF)}
     }
-
+print("hcr8")  
   hvt=rtn
   
   ## TAC
@@ -163,7 +163,7 @@ hcrFn<-function(object,refs,
     else
        rtn=catch(fwd(object, harvest=hvt))[,ac(hcrYrs)]
     rtn[]=rep(c(apply(rtn,c(3:6),mean)),each=dim(rtn)[2])
-
+print("hcr9")  
     ## Bounds
     if (!is.null(bndTac)){
       ## Reference TAC for bounds
