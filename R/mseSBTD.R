@@ -2,7 +2,9 @@
 #' 
 #' @title mseSBTD 
 #' 
-#' @description 
+#' @description A function for running a full feedback MSE with an empirical control rule based on
+#' the trend in an index of abudance
+#' 
 #' @author Laurence Kell, Sea++
 #'  
 #' @name mseSBTD

@@ -5,7 +5,7 @@ utils::globalVariables(c("hcrSBT2"))
 #' 
 #' @title mseEMPSBT2Alb 
 #' 
-#' @description 
+#' @description A function to run a full feedback MSE, using an emprirical HCR 
 #' @author Laurence Kell, Sea++
 #'  
 #' @name mseEMPSBT2Alb

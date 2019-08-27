@@ -4,7 +4,7 @@ utils::globalVariables(c("sra"))
 #' 
 #' @title mseSRA
 #' 
-#' @description 
+#' @description MSE using Stock Reduction Analysis
 #' @author Laurence Kell, Sea++
 #'  
 #' @name mseSRA

@@ -1,7 +1,7 @@
 #' @title hcr
 #'
-#' @description
-#' Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a hockey stock harvest control rule.
+#' @description A Harvest Control Rule (HCR) to calculate F, or Total Allowable Catch (TAC) based 
+#' on a hockey stock harvest control rule.
 #'
 #' @param object an object of class \code{biodyn} or
 #' @param ... any additional arguments

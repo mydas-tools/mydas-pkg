@@ -2,7 +2,8 @@
 #' 
 #' @title hcrSBTD 
 #' 
-#' @description 
+#' @description An emprirical Harvest Control Rule that sets a quota based on a trend in an index
+#' 
 #' @author Laurence Kell, Sea++
 #'  
 #' @anme hcrSBTD  

@@ -4,7 +4,7 @@ utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 #' 
 #' @title priors 
 #' 
-#' @description calculates priors
+#' @description Calculates priors, i.e. r and reference points, based on life history parameters
 #' @author Laurence Kell, Sea++
 #' 
 #' @name priors 

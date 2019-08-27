@@ -4,7 +4,7 @@ utils::globalVariables(c("FLXSA","FLBRP","brp"))
 #' 
 #' @title mseXSA 
 #' 
-#' @description 
+#' @description MSE with XSA as the stock assessment in the management procedure 
 #' @author Laurence Kell, Sea++
 #'     
 #' @param om \code{FLStock} object as the operating model

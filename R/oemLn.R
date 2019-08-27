@@ -4,7 +4,9 @@ utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 #' 
 #' @title alk
 #' 
-#' @description 
+#' @description Create an Age Length key, i.e. probability of a fish of a given age being in 
+#' a length bin, can be used to sample length frequency distributions
+#' 
 #' @author Laurence Kell, Sea++
 #' 
 #' @name alk
@@ -37,14 +39,14 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
   
   alk=mdply(data.frame(age=age), function(age,par,cv,lmax){
     res=adply(par,2,function(x,age,cv,lmax){
-        ln =seq(1:ceiling(x["linf"]*lmax))
+        bin =seq(1:ceiling(x["linf"]*lmax))
         len=vonB(age,x)
         p  =c(pnorm(1,len,len*cv),
-              dnorm(ln[-c(1,length(ln))],len,len*cv),
-              pnorm(ln[length(ln)],len,len*cv,lower.tail=FALSE))
+              dnorm(bin[-c(1,length(bin))],len,len*cv),
+              pnorm(bin[length(bin)],len,len*cv,lower.tail=FALSE))
   
-        data.frame(len=ln,p=p/sum(p))},
-      age=age,cv=cv,lmax=lmax)},par=lh,cv=cv,lmax=lmax)
+        data.frame(len=bin,p=p/sum(p))},
+      age=age,cv=cv,lmax=lmax)},par=par,cv=cv,lmax=lmax)
   
   alk=cast(alk,age~len~iter,fun=sum,value="p")
   alk=FLPar(array(alk,dim=unlist(llply(dimnames(alk),length)),dimnames=dimnames(alk)))

@@ -4,7 +4,9 @@ utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","ml
 #' 
 #' @title mlz 
 #' 
-#' @description 
+#' @description A wrapper function for the MLZ package https://cran.r-project.org/web/packages/MLZ/index.html
+#' to allow i be simulation tested.
+#' 
 #' @author Laurence Kell, Sea++
 #'  
 #' @param year blah,blah,blah,...

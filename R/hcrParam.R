@@ -2,7 +2,7 @@
 #' 
 #' @title hcrParam 
 #' 
-#' @description 
+#' @description Creats an \code{FLPar} object for hockey stock HCR based on ftar,btrig,fmin, and blim. 
 #' @author Laurence Kell, Sea++
 #'  
 #' @name hcrParam 

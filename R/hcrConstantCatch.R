@@ -2,7 +2,7 @@
 #' 
 #' @title hcrConstantCatch 
 #' 
-#' @description 
+#' @description Sets a constant catch
 #' @author Laurence Kell, Sea++ 
 #' 
 #' @param yrs \code{numeric} target years to take catch over
@@ -19,6 +19,7 @@
 #' @examples
 #' \dontrun{
 #' data(pl4)
+#' hcrConstantCatch(2010:2012,catch(ple4))
 #' }
 #' 
 hcrConstantCatch<-function(yrs,catch,...){
