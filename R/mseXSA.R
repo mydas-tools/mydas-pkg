@@ -20,8 +20,8 @@ utils::globalVariables(c("FLXSA","FLBRP","brp"))
 #' @param start \code{numeric}  default is range(om)["maxyear"]-30
 #' @param end \code{numeric}  default is range(om)["maxyear"]-interval
 #' @param interval  \code{numeric}  default is 3 years over which to run MSE, doesnt work if interval==1, this is a bug
-#' @param sr_diviances \code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
-#' @param u_diviances   \code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
+#' @param sr_deviances \code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
+#' @param u_deviances   \code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
 #' @param maxF  \code{numeric} 1.0 Capacity, i.e. F in OM can not be greater than this
 #' @param whitebox  \code{boolean} FALSE
 #' 
@@ -54,25 +54,25 @@ mseXSA<-function(
   interval=3,start=range(om)["maxyear"]-30,end=range(om)["maxyear"]-interval,
   
   #Stochasticity, either by default or suppliedas args
-  sr_diviances=rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
-  u_diviances =rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
+  sr_deviances=rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),
+  u_deviances =rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),
   
   #Capacity, i.e. F in OM can not be greater than this
   maxF=1.0,
   whitebox=FALSE){ 
  
-  if (dims(om)$iter==1 & dims(sr_diviances)$iter>1) om=propagate(om,dims(sr_diviances)$iter)
+  if (dims(om)$iter==1 & dims(sr_deviances)$iter>1) om=propagate(om,dims(sr_deviances)$iter)
   
   ##Check last year so you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
 
   ## Make sure number of iterations in OM are consistent
-  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_diviances)$iter)
+  nits=c(om=dims(om)$iter, eq=dims(params(eq))$iter, rsdl=dims(sr_deviances)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in om")
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
 
   ## Limit on capacity, add to fwd(om,maxF=maxF) so catches dont go stuoid 
-  maxF=mean(FLQuant(1,dimnames=dimnames(sr_diviances))%*%apply(fbar(window(om,end=start)),6,max)*maxF,na.rm=TRUE)
+  maxF=mean(FLQuant(1,dimnames=dimnames(sr_deviances))%*%apply(fbar(window(om,end=start)),6,max)*maxF,na.rm=TRUE)
 
   ## Observation Error (OEM) setup before looping through years 
   ## this done so biology can be different from OM
@@ -83,7 +83,7 @@ mseXSA<-function(
   #sink(NULL)
 
   cpue=window(stock.n(smp),end=start-1)[seq(dim(smp)[1]-1)]
-  cpue=cpue%*%u_diviances[dimnames(cpue)$age,dimnames(cpue)$year]
+  cpue=cpue%*%u_deviances[dimnames(cpue)$age,dimnames(cpue)$year]
 
   ## MP, no need to add biological parameters and catch at this stage, as these are already there, 
   ## rather get rid of stuff that has to be added by OEM and stock assessment fit
@@ -104,7 +104,7 @@ mseXSA<-function(
       ## CPUE
       cpue=window(cpue,end=iYr-1)
       cpue[,ac(iYr-(interval:1))]=stock.n(smp)[dimnames(cpue)$age,ac(iYr-(interval:1))]%*%
-        u_diviances[dimnames(cpue)$age,ac(iYr-(interval:1))]
+        u_deviances[dimnames(cpue)$age,ac(iYr-(interval:1))]
 
       ## Update and fill in biological parameters
       if (iYr==start) 
@@ -194,9 +194,9 @@ mseXSA<-function(
     tac[is.na(tac)]=1  
     
     #### Operating Model update
-    #try(try(save(om,eq,tac,sr_diviances,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
+    #try(try(save(om,eq,tac,sr_deviances,maxF,file="/home/laurence/Desktop/tmp/mseXSA3.RData")))
 
-    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=sr_diviances)
+    om =fwd(om,catch=tac,sr=list(model="bevholt",params=params(eq)),residuals=sr_deviances)
             #effort_max=mean(maxF)) 
     }
   
