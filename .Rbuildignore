@@ -1,4 +1,15 @@
-R/svr.R
+^[.].*$
+^.*/[.].*$
 R/ini.R
 ^.*\.Rproj$
 ^\.Rproj\.user$
+vignettes
+vignettes/cache
+vignettes/tex
+.travis.yml
+demo
+demo/mse-emp.R
+demo/mse-mpb.R
+demo/mse-sra.R
+demo/mse-xsa.R
+demo/00index
