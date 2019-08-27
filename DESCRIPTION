@@ -14,7 +14,6 @@ Suggests:
   stats
 License: GPL (>= 2)
 Collate: 
- svr.R
  data.R
  oem.R
  biodyn-sra.R
