@@ -35,7 +35,7 @@ mseSRA(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
 \item{maxF}{blah,blah,blah,...}
 }
 \description{
-mseSRA
+MSE using Stock Reduction Analysis
 }
 \details{
 mse

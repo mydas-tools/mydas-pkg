@@ -15,7 +15,7 @@ hcrConstantCatch(yrs, catch, ...)
 \item{...}{any additional arguments}
 }
 \description{
-hcrConstantCatch
+Sets a constant catch
 }
 \details{
 hcrConstantCatch
@@ -23,6 +23,7 @@ hcrConstantCatch
 \examples{
 \dontrun{
 data(pl4)
+hcrConstantCatch(2010:2012,catch(ple4))
 }
 
 }

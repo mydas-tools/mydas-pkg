@@ -1,4 +1,4 @@
-#' @title hcr
+#' @title hockeyStick
 #'
 #' @description A Harvest Control Rule (HCR) to calculate F, or Total Allowable Catch (TAC) based 
 #' on a hockey stock harvest control rule.
@@ -16,107 +16,107 @@
 #' stkYrs numeric vector with years for calculating stock status, max(as.numeric(dimnames(stock(object))$year)),
 #' refYrs numeric vector with years for calculating reference points, max(as.numeric(dimnames(catch(object))$year)),
 #' hcrYrs numeric vector with years for setting management, max(as.numeric(dimnames(stock(object))$year)),
-#' tacMn \code{logical} should the TACs be the average of the values returned?
 #' maxF  =2 numeric vector specifying maximum relative F
 #' 
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
 #'
 #' @export
-#' @rdname hcr
+#' @rdname hockeyStick
 #'
-#' @aliases hcr 
-#'          hcr-method 
-#'          hcr,FLStock,FLBRP-method 
-#'          hcr,biodyn,FLPar-method
+#' @aliases hockeyStick 
+#'          hockeyStick-method 
+#'          hockeyStick,FLStock,FLBRP-method 
+#'          hockeyStick,biodyn,FLPar-method
 #' @examples
 #' \dontrun{
 #' bd   =sim()
 #'
 #' bd=window(bd,end=29)
 #' for (i in seq(29,49,1))
-#' bd=fwd(bd,harvest=hcr(bd,yr=i,yr=i+1)$hvt)
+#' bd=fwd(bd,harvest=hockeyStick(bd,yr=i,yr=i+1)$hvt)
 #' }
-setGeneric('hcr', function(object,refs,...) standardGeneric('hcr'))
+setGeneric('hockeyStick', function(object,refs,...) standardGeneric('hockeyStick'))
 
-setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
+setMethod('hockeyStick', signature(object="FLStock",refs='FLBRP'),
           function(object,refs,
           params=hcrParam(ftar =0.70*fmsy(refs),
                           btrig=0.80*bmsy(refs),
                           fmin =0.01*fmsy(refs),
                           blim =0.40*bmsy(refs)),
-          stkYrs=max(as.numeric(dimnames(stock(object))$year)),
-          refYrs=max(as.numeric(dimnames(catch(object))$year)),
-          hcrYrs=max(as.numeric(dimnames(stock(object))$year)),
+          stkYrs=max(as.numeric(dimnames(stock(object))$year))-1,
+          refYrs=max(as.numeric(dimnames(catch(object))$year))-1,
+          hcrYrs=max(as.numeric(dimnames(stock(object))$year))+1,
           tac   =TRUE,
-          tacMn =TRUE,
           bndF  =NULL, #c(1,Inf),
           bndTac=NULL,
           maxF  =2,
           ...)
-  hcrFn(object,refs,
+  hcrFn2(object,refs,
                 params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
-
-setMethod('hcr', signature(object="biodyn",refs='FLPar'),
+setMethod('hockeyStick', signature(object="biodyn",refs='FLPar'),
   function(object,refs=hcrParam(ftar =0.70*fmsy(refs),
                                 btrig=0.80*bmsy(refs),
                                 fmin =0.01*fmsy(refs),
                                 blim =0.40*bmsy(refs)),
            params=refs,
-           stkYrs=max(as.numeric(dimnames(stock(object))$year)),
-           refYrs=max(as.numeric(dimnames(catch(object))$year)),
-           hcrYrs=max(as.numeric(dimnames(stock(object))$year)),
+           stkYrs=max(as.numeric(dimnames(stock(object))$year))-1,
+           refYrs=max(as.numeric(dimnames(catch(object))$year))-1,
+           hcrYrs=max(as.numeric(dimnames(stock(object))$year))+1,
            tac   =TRUE,
            bndF  =NULL, #c(1,Inf),
            bndTac=NULL,
            maxF  =2,
            ...)
-  hcrFn(object,refs,
+  hcrFn2(object,refs,
         params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
-hcrFn<-function(object,refs, 
+hcrFn2<-function(object,refs, 
                params=hcrParam(ftar =0.70*refpts(object)['fmsy'],
                                btrig=0.80*refpts(object)['bmsy'],
                                fmin =0.01*refpts(object)['fmsy'],
                                blim =0.40*refpts(object)['bmsy']),
-               stkYrs=max(as.numeric(dimnames(stock(object))$year)),
-               refYrs=max(as.numeric(dimnames(catch(object))$year)),
-               hcrYrs=max(as.numeric(dimnames(stock(object))$year)),
+               stkYrs=max(as.numeric(dimnames(stock(object))$year))-1,
+               refYrs=max(as.numeric(dimnames(catch(object))$year))-1,
+               hcrYrs=max(as.numeric(dimnames(stock(object))$year))+1,
                tac   =TRUE,
-               bndF  =NULL, #c(1,Inf),
+               bndF  =NULL, #c(0,Inf)
                bndTac=NULL, 
                maxF  =2,
                ...) {
-print("hcr1")  
+  
   ## HCR
   dimnames(params)$params=tolower(dimnames(params)$params)
   params=as(params,'FLQuant')  
   params["blim"]=c(qmax(params["blim"],1))
-print("hcr2")    
+  
   #if (blim>=btrig) stop('btrig must be greater than blim')
   a=(params['ftar']-params['fmin'])/(params['btrig']-params['blim'])
   b=params['ftar']-a*params['btrig']
-print("hcr3")  
+  
   ## Calc F
   # bug 3
   #val=(SSB%*%a) %+% b
   # bug stock for biomass
-  stk=FLCore::apply(stock(object)[,ac(stkYrs)],6,mean)
-print("hcr4")  
+  stk=FLCore::apply(ssb(object)[,ac(stkYrs)],6,mean)
+
   rtn=(stk%*%a)  
   rtn=FLCore::sweep(rtn,2:6,b,'+')
-print("hcr5")  
+  
   fmin=as(params['fmin'],'FLQuant')
   ftar=as(params['ftar'],'FLQuant')
+
   for (i in seq(dims(object)$iter)){
     FLCore::iter(rtn,i)[]=max(FLCore::iter(rtn,i),FLCore::iter(fmin,i))
     FLCore::iter(rtn,i)[]=min(FLCore::iter(rtn,i),FLCore::iter(ftar,i))} 
+
   rtn=window(rtn,end=max(hcrYrs))
-  #dimnames(rtn)$year=min(hcrYrs)  
-print("hcr6")  
-  rtn=window(rtn,end=max(hcrYrs))
-  rtn[,ac(hcrYrs)]=rtn[,dimnames(rtn)$year[1]]
-print("hcr7")    
+  
+  for (i in ac(hcrYrs))
+    rtn[,i]=rtn[,1]
+  
+  rtn=rtn[,ac(hcrYrs)]
+  
   ### Bounds ##################################################################################
   ## F
   if (!is.null(bndF)){  
@@ -135,26 +135,27 @@ print("hcr7")
         
         if (!is.null(maxF)) rtn=qmin(rtn,maxF)}
     }
-print("hcr8")  
   hvt=rtn
-  
+
   ## TAC
   if (!tac)
     return(hvt)
   else{
     ## TACs for target F
-  
+    
     if ("FLStock"%in%is(object))
-      object=fwdWindow(object, refs, end=max(as.numeric(hcrYrs)))
+      if (dim(object)[2]<max(as.numeric(hcrYrs)))
+        object=fwdWindow(object, refs, end=max(as.numeric(hcrYrs)))
     else
       object=window(object, end=max(as.numeric(hcrYrs)))
     
     object[,ac(max(as.numeric(hcrYrs)))]=object[,ac(max(as.numeric(hcrYrs))-1)]
     
-    if ("FLStock"%in%is(object)) 
-       object=fwd(object,fbar=fbar(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=refs)
-     else
-       object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(hcrYrs)-1))])
+    ## within year catch forecast
+    #if ("FLStock"%in%is(object)) 
+    #   t=1 #object=fwd(object,catch=catch(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=refs)
+    # else
+    #   object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(hcrYrs)-1))])
     
     hvt[is.na(hvt)]=6.6666
     #try(save(object,hvt,refs,hcrYrs,file="/home/laurence/Desktop/tmp/mseXSA4.RData"))
@@ -162,8 +163,9 @@ print("hcr8")
        rtn=catch(fwd(object, fbar=hvt,sr=refs))[,ac(hcrYrs)]
     else
        rtn=catch(fwd(object, harvest=hvt))[,ac(hcrYrs)]
+
     rtn[]=rep(c(apply(rtn,c(3:6),mean)),each=dim(rtn)[2])
-print("hcr9")  
+
     ## Bounds
     if (!is.null(bndTac)){
       ## Reference TAC for bounds

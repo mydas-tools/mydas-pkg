@@ -40,16 +40,16 @@ mseXSA(om, eq, mp, control, rf = "missing", ftar = 1, fmin = 0.05,
 
 \item{end}{\code{numeric}  default is range(om)["maxyear"]-interval}
 
-\item{sr_diviances}{\code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),}
+\item{sr_deviances}{\code{FLQuant} Stochasticity, either by default or supplied as args rlnoise(dim(om)[6],FLQuant(0,dimnames=list(year=start:(end+interval))),0.3),}
 
-\item{u_diviances}{\code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),}
+\item{u_deviances}{\code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),}
 
 \item{maxF}{\code{numeric} 1.0 Capacity, i.e. F in OM can not be greater than this}
 
 \item{whitebox}{\code{boolean} FALSE}
 }
 \description{
-mseXSA
+MSE with XSA as the stock assessment in the management procedure
 }
 \examples{
 \dontrun{

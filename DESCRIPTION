@@ -1,12 +1,13 @@
 Package: mydas
 Title: Tools for conducting Management Strategy Evaluation for data limited stocks
-Version: 1.1.0
+Version: 1.1.6
 Author: Laurence Kell <laurie@seaplusplus.co.uk>	
 Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
 Depends:
   R(>= 3.6.0),
-  FLCore (>= 2.6.13)
+  FLCore (>= 2.6.13),
+  FLBRP(>=2.5.3)
 Imports:
   methods,
 Suggests:
@@ -27,20 +28,20 @@ Collate:
  priors.R
  smryStat.R
  xsaTest.R
- hcr.R
-  hcr2o3.R
-  hcrConstantCatch.R
-  hcrICES.R
-  hcrParam.R
-  hcrSBTD.R
-  hcrSBTP.R
-  mseMPB.R
-  mseSBTD.R
-  mseSBTDAlb.R
-  mseSBTP.R
-  mseSBTPAlb.R
-  mseSRA.R
-  mseXSA.R
+ hockeyStick.R
+ hcr2o3.R
+ hcrConstantCatch.R
+ hcrICES.R
+ hcrParam.R
+ hcrSBTD.R
+ hcrSBTP.R
+ mseMPB.R
+ mseSBTD.R
+ mseSBTDAlb.R
+ mseSBTP.R
+ mseSBTPAlb.R
+ mseSRA.R
+ mseXSA.R
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

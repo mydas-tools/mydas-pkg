@@ -155,7 +155,7 @@ mp=setMP(as(window(om,end=55),"biodyn"),
 res=mseSRA(om,eq,mp,
               start=mseStart[stock],end=mseStart[stock]+40,
               ftar=ftar,btrig=btrig,
-              srDev=srDev)
+              sr_deviances=srDev)
 ```
 
 

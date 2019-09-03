@@ -15,7 +15,8 @@ alk(object, ...)
 \item{...}{any additional arguments}
 }
 \description{
-alk
+Create an Age Length key, i.e. probability of a fish of a given age being in 
+a length bin, can be used to sample length frequency distributions
 }
 \details{
 alk

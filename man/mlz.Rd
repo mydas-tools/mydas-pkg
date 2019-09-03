@@ -23,7 +23,8 @@ mlzFn(year, len, lc, linf, k, ncp = 2, ss = 500)
 \item{ss}{blah,blah,blah,...}
 }
 \description{
-mlz
+A wrapper function for the MLZ package https://cran.r-project.org/web/packages/MLZ/index.html
+to allow i be simulation tested.
 }
 \details{
 mlz

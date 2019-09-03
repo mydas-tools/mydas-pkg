@@ -13,7 +13,7 @@ priors(object, eq = lhEql(lhPar(object)))
 \item{eq}{blah,blah,blah,...}
 }
 \description{
-calculates priors
+Calculates priors, i.e. r and reference points, based on life history parameters
 }
 \details{
 priors

@@ -34,7 +34,7 @@ mseEMPSBT2Alb(om, eq, control = c(k1 = 0.25, k2 = 0.25),
 \item{maxF}{blah,blah,blah,...}
 }
 \description{
-mseEMPSBT2Alb
+A function to run a full feedback MSE, using an emprirical HCR
 }
 \details{
 mse

@@ -126,7 +126,7 @@ empD<-foreach(i=(seq(dim(scen)[1])),
               .packages=c("FLCore","FLasher","FLBRP","FLife","plyr","reshape")) %dopar%{
                 
                omRes=mseSBTD(om,eq,control=with(scen[i,],c(k1=k1,k2=k2,gamma=gamma)),start=60,end=100,
-                             srDev=srDev,uDev=uDev)
+                             srDev=sr_deviances,uDev=u_deviances)
 
                res  =cbind(scen=i,k1=scen[i,"k1"],k2=scen[i,"k2"],gamma=scen[i,"gamma"],
                             omSmry(omRes,eq,lh))

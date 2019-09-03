@@ -1,4 +1,4 @@
-#' hcr
+#' hcrSBTD
 #' 
 #' @title hcrSBTD 
 #' 

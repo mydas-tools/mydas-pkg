@@ -31,13 +31,13 @@ mp=setMP(as(window(om,end=55),"biodyn"),
 
 nits=dims(om)$iter
 set.seed(1234)
-  sr_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
-  u_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
-sel_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
+  sr_deviances=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+  u_deviances=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
+sel_deviances=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
 
 eq=FLCore:::iter(eq,seq(nits))
 
-mse2=mseMPB2(om,eq,mp,start=55,ftar=0.5,sr_deviates=sr_deviates,u_deviates=u_deviates,sel_deviates=sel_deviates)
+mse2=mseMPB2(om,eq,mp,start=55,ftar=0.5,sr_deviances=sr_deviances,u_deviances=u_deviances,sel_deviances=sel_deviances)
 
 scen=expand.grid(stock=c("turbot","lobster","ray","pollack","razor","brill","sprat"),
                   ftar=c(1.0,0.7),btrig=c(0.5,0.6))
@@ -50,9 +50,9 @@ runMPB<-function(stock,ftar,btrig) {
   eq=FLCore:::iter(eq,seq(nits))
   
   set.seed(1234)
-  sr_deviates =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
-  u_deviates  =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
-  sel_deviates=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
+  sr_deviances =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+  u_deviances  =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
+  sel_deviances=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100,age=dimnames(m(om))$age)),0.2,b=0.0)
 
   mp=setMP(as(window(om,end=55),"biodyn"),
                  r =median(prior["r"],na.rm=T),
@@ -63,7 +63,7 @@ runMPB<-function(stock,ftar,btrig) {
   res=mseMPB2(om,eq,mp,
               start=mseStart[stock],end=mseStart[stock]+40,
               ftar=ftar,btrig=btrig,
-              sr_deviates=sr_deviates,u_deviates=u_deviates,sel_deviates=sel_deviates)
+              sr_deviances=sr_deviances,u_deviances=u_deviances,sel_deviances=sel_deviances)
   
   res2=data.frame("stock"=stock,"ftar"=ftar,"btrig"=btrig,omSmry(res,eq,lh[c("a","b")]))
   

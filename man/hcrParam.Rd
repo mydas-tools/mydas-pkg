@@ -17,7 +17,7 @@ hcrParam(ftar, btrig, fmin, blim)
 \item{blim}{blah,blah,blah,...}
 }
 \description{
-hcrParam
+Creats an \code{FLPar} object for hockey stock HCR based on ftar,btrig,fmin, and blim.
 }
 \details{
 hcrParam

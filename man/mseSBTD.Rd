@@ -38,7 +38,8 @@ mseSBTD(om, eq, control = "missing", sr_deviances, u_deviances,
 \item{...}{any additional arguments}
 }
 \description{
-mseSBTD
+A function for running a full feedback MSE with an empirical control rule based on
+the trend in an index of abudance
 }
 \details{
 mseSBTD

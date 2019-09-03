@@ -1,6 +1,6 @@
 ---
-title: "FLife"
-subtitle: "WKLIFE Life History Relationships"
+title: "mydas"
+subtitle: "Life History Relationships"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Laurence Kell"
 output: rmarkdown:::pdf_document
@@ -14,7 +14,7 @@ license: Creative Commons Attribution-ShareAlike 4.0 International
 ---
 
 
-# FLife package
+# mydas package
 
 ```{r knitr_init, echo=FALSE, results="hide"}
 library(knitr)
@@ -41,6 +41,61 @@ library(mydas)
 ```{r, theme, echo=FALSE}
 theme_set(theme_bw())
 options(digits=3)
+```
+
+
+## Install FLR packages
+
+To follow this tutorial a number of packages need to be installed, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
+
+```{r, eval=FALSE}
+install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
+             repos="http://flr-project.org/R")
+```
+
+`devtools` also needs to be installed and loaded so that the `mydas` package can be installed from the GitHub repository.
+
+```{r}
+install.packages("devtools",dependencies=TRUE)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+library(devtools)
+
+devtools::install_github("lauriekell/mydas-pkg")
+```
+
+## Load Libraries
+```{r}
+library(FLCore)
+library(FLasher)
+library(FLBRP)
+library(FLife)
+library(mydas)
+```
+
+
+### Life history parameters
+Get fishbase data
+```{r}
+stocks=data.frame(
+   species=c("Psetta maxima","Scophthalmus rhombus","Raja clavata",
+              "Pollachius pollachius","Sprattus sprattus sprattus"),
+   name=   c("Turbot",       "Brill",               "Ray",        
+             "Pollack",      "Sprat"))
+
+load(url("https://github.com//fishnets//fishnets//blob//master//data//fishbase-web//fishbase-web.RData?raw=True"))
+
+finfish=subset(fb,as.character(species)%in%as.character(stock$species))
+```
+
+```{r}
+
+
+names(lh)[c(14,17)] = c("l50","a50")
+lh=lh[,c("linf","k","t0","a","b","a50","l50")]
+
+head(lh)
 ```
 
 # Life history parameters

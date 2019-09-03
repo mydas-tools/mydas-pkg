@@ -1,5 +1,5 @@
 ---
-title: "Simulation Testing Data Limited Methods **FLife**"
+title: "Simulation Testing Data Limited Methods **mydas**"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -157,8 +157,10 @@ is a R package for simulation and estimation using life-history ratios and lengt
 library(LBSPR)
 ```
 
+
 ```{r, alk}
-ak=alk(lh)  
+save(lh,file="/home/laurence/tmp/lh.RData")
+ak=alk(lh)    
 ```
 
 ```{r, lfd}

@@ -20,10 +20,10 @@ hcrSBTD(yrs, control = FLPar(c(k1 = 0.25, k2 = 0.25, gamma = 1)), index,
 \item{...}{any additional arguments}
 }
 \description{
-hcrSBTD
+An emprirical Harvest Control Rule that sets a quota based on a trend in an index
 }
 \details{
-hcr
+hcrSBTD
 }
 \examples{
 \dontrun{

@@ -22,7 +22,7 @@ hcr2o3(yrs, catch, index, fproxy = 1, bproxy = 1, rule = c("2o3",
 \item{rule}{c("2o3","slope","loess")}
 }
 \description{
-hcr2o3
+HCR for the ICES 2 over 3 rule, see http://www.ices.dk/sites/pub/Publication%20Reports/Expert%20Group%20Report/acom/2017/WKMSYCAT34/01.%20WKMSYCAT34%20REPORT%202017.pdf
 }
 \details{
 hcr2o3
