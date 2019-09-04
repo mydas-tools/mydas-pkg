@@ -85,57 +85,57 @@ setGeneric('oem',    function(object,...) standardGeneric('oem'))
 #     cpue=cpue%*%catch.wt(object)
 # 
 #   cpue})
-#setMethod('survey', signature(object='FLStock'),
-# survey=function(object,timing=FLQuant(0,dimnames=dimnames(m(object))),wt=stock.wt(object),sd=0,log=FALSE,...){
-#   
-#   if(units(harvest(object)) == 'f'){
-#     res      <- colSums(stock.n(object)*exp(-harvest(object)*timing - m(object)*timing)*wt, na.rm=FALSE)
-#     dim(res) <- c(1, dim(res))
-#     dmns     <-dimnames(stock(object))
-#     dmns$iter<-dimnames(res)$iter
-#     
-#     res=FLQuant(res, dimnames=dmns)
-#   } else if(units(harvest(object)) == 'hr') {
-#     
-#     res      = colSums(object@stock.n*(1-object@harvest*timing)*exp(-object@m*timing)*timing*wt)
-#     dim(res) = c(1, dim(res))
-#     
-#     res=FLQuant(res, dimnames=dimnames(object@stock))
-#   } else
-#     stop('Correct units (f or hr) not specified in the harvest slot')
-#   
-#   if (sd>0){
-#     if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
-#       res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)
-#   }
-# 
-#    res}
-# 
-# #setMethod('cpue', signature(object='FLStock'),
-# u=function(object,partialf=FLQuant(1,dimnames=dimnames(m(object))),wt=catch.wt(object),sd=0,log=FALSE,...){
-#   
-#   if(units(harvest(object)) == 'f'){
-#     res      <- colSums(stock.n(object)*harvest(object)*partialf/(harvest(object)+m(object))*exp(1-harvest(object)-m(object)), na.rm=FALSE)
-#     dim(res) <- c(1, dim(res))
-#     dmns     <-dimnames(stock(object))
-#     dmns$iter<-dimnames(res)$iter
-#     
-#     res=FLQuant(res, dimnames=dmns)
-#   } else if(units(harvest(object)) == 'hr') {
-#     
-#     res      = colSums(object@stock.n*(1-object@harvest*partialf)*exp(-object@m)*wt)
-#     dim(res) = c(1, dim(res))
-#     
-#     res=FLQuant(res, dimnames=dimnames(object@stock))
-#   } else
-#     stop('Correct units (f or hr) not specified in the harvest slot')
-#   
-#   if (sd>0){
-#     if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
-#       res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)}
-#   
-#   res} 
-# 
+setMethod('survey', signature(object='FLStock'),
+   function(object,timing=FLQuant(0,dimnames=dimnames(m(object))),wt=stock.wt(object),sd=0,log=FALSE,...){
+
+  if(units(harvest(object)) == 'f'){
+    res      <- colSums(stock.n(object)*exp(-harvest(object)*timing - m(object)*timing)*wt, na.rm=FALSE)
+    dim(res) <- c(1, dim(res))
+    dmns     <-dimnames(stock(object))
+    dmns$iter<-dimnames(res)$iter
+
+    res=FLQuant(res, dimnames=dmns)
+  } else if(units(harvest(object)) == 'hr') {
+
+    res      = colSums(object@stock.n*(1-object@harvest*timing)*exp(-object@m*timing)*timing*wt)
+    dim(res) = c(1, dim(res))
+
+    res=FLQuant(res, dimnames=dimnames(object@stock))
+  } else
+    stop('Correct units (f or hr) not specified in the harvest slot')
+
+  if (sd>0){
+    if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else
+      res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)
+  }
+
+   res})
+
+setMethod('cpue', signature(object='FLStock'),
+ function(object,partialf=FLQuant(1,dimnames=dimnames(m(object))),wt=catch.wt(object),sd=0,log=FALSE,...){
+
+  if(units(harvest(object)) == 'f'){
+    res      <- colSums(stock.n(object)*harvest(object)*partialf/(harvest(object)+m(object))*exp(1-harvest(object)-m(object)), na.rm=FALSE)
+    dim(res) <- c(1, dim(res))
+    dmns     <-dimnames(stock(object))
+    dmns$iter<-dimnames(res)$iter
+
+    res=FLQuant(res, dimnames=dmns)
+  } else if(units(harvest(object)) == 'hr') {
+
+    res      = colSums(object@stock.n*(1-object@harvest*partialf)*exp(-object@m)*wt)
+    dim(res) = c(1, dim(res))
+
+    res=FLQuant(res, dimnames=dimnames(object@stock))
+  } else
+    stop('Correct units (f or hr) not specified in the harvest slot')
+
+  if (sd>0){
+    if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else
+      res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)}
+
+  res})
+
 # cpueBiodym2Aspic=function(bd,type='B0',n=1,sd=0,log=TRUE){
 #   
 #   type=toupper(type)
