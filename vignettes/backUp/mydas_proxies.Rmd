@@ -1,0 +1,164 @@
+---
+title: "Selection of Stock Assessment Methods and Proxy Reference Points for use in Management Procedures"
+subtitle: "Comparison of Proxies with MSY Reference Points"
+author: "L Kell"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+## Power of proxy reference points and indicators to detect overfishing
+
++ **Question:** What assumptions are the most important in i) determining stock dynamics and ii) the power of proxies reference points to detect stock status?  In particular    
+  - Which potential indicators and proxy reference points are the most robust? i.e. have high power to detect overfishing; and  
+  - What are the benefits of reducing uncertainty?
+    
++ **Methods** Simulate a range of stock dynamics
+   - Project for different levels of constant F relative to $F_{MSY}$ and summarise scenarios by clustering on the
+      - Expected dynamics i.e. reference points and proxies; and  
+      - Time series, i.e. frequency spectrum
+   - Run scenarios with an increasing trend in F that leads to overfishing, then implement a recovery plan that brings fishing to the $F_{MSY}$ level then screen potential empirical MPs by
+  - Generating length, catch and CPUE indicators using an OEM
+  - Compare indicators to OM, both trends and status relative to reference points using Reciever Operating Characteristics (ROCs)
+  - Compare to model based indicators by fitting indices using LBSPR, SRA and a biomass dynamic model then evaluate using ROC and compare with empirical indicators
+
+
+## Prediction Skill
+
++ Screen model based MPs
+  - Perform 1,2,3, step ahead projections using LBSPR, SRA and a biomass dynamic model
+  - Use MASE to identify assessment models with prediction skill
+
+```{r, knitr, eval=TRUE, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(knitr)
+
+opts_chunk$set(comment   =NA, 
+               warning   =FALSE, 
+               message   =FALSE, 
+               error     =FALSE, 
+               echo      =FALSE,
+               fig.width =10, 
+               fig.height=10,
+               cache     =TRUE, 
+               fig.path  ="tex/proxies-",
+               cache.path="cache/proxies/")
+
+iFig=0
+iTab=0
+```
+```{r, pkgs} 
+library(FLCore)
+library(FLBRP)
+library(FLasher)
+library(FLife)
+library(mydas)
+library(popbio)
+
+library(ggplotFL)
+library(scales)
+library(plyr)
+library(dplyr)
+library(reshape)
+library(grid)
+library(reshape)
+library(popbio)
+library(magrittr)
+library(broom)
+library(GGally)
+```
+
+```{r, parallel, eval=FALSE}
+library(doParallel)
+library(foreach)
+
+cl=makeCluster(3)
+registerDoParallel(cl)
+```
+
+```{r, params, eval=FALSE}
+par=lhPar(FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, s=0.9,
+           a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA"))
+
+par=propagate(par,16)
+dat=expand.grid(bg=c(3,3.1),sel3=c(5000,5),s=c(0.75,0.9),k=0.28*c(1,0.5))
+
+par["bg"]  =dat$bg
+par["sel3"]=dat$sel3
+par["s" ]  =dat$s
+par["k" ]  =dat$k
+```
+
+```{r}
+smry=popdyn(par)
+```
+
+# Figures
+
+## MSY reference points and proxies
+
+```{r, lifeHistory}
+ggpairs(model.frame(smry[c("msy","fmsy","bmsy","r","rc")][,-6]),
+        #mapping = ggplot2::aes(color=as.character(sel3)),
+        lower = list(continuous = wrap(mydas:::my_smooth)),
+        diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),
+        title = "")+
+  theme(legend.position ="none",
+        panel.grid.major =element_blank(),
+        axis.ticks       =element_blank(),
+        axis.text.x      =element_blank(),
+        axis.text.y      =element_blank(),
+        panel.border     =element_rect(linetype = 1, colour="black", fill=NA))+
+  theme_bw(16)
+```
+
+
+**Figure `r iFig=iFig+1; iFig`.**  Relationship between MSY reference points and population growth rate.
+
+
+```{r, proxies}
+ggpairs(model.frame(smry[c("lopt","clmsy","slmsy","mk","fm","lfm","spr0","msy","fmsy","bmsy")])[,-11],
+        lower = list(continuous = wrap(mydas:::my_smooth)),
+        diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),  
+        title = "")+
+  theme(legend.position ="none",
+        panel.grid.major =element_blank(),
+        axis.ticks       =element_blank(),
+        axis.text.x      =element_blank(),
+        axis.text.y      =element_blank(),
+        panel.border     =element_rect(linetype = 1, colour="black", fill=NA))+
+  theme_bw(16)
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Relationship between MSY reference points and their potential proxies.
+
+
+```{r, len-indicators, eval=FALSE}
+idx=transform(merge(ind,refs[,c("slmsy","clmsy","lopt","lfm","iter")]),
+              sln=sln/slmsy,cln=cln/clmsy,
+              sl50=sln/l50,cl50=cln/l50,
+              slopt=sln/lopt,clopt=cln/lopt,
+              slfm =sln/lfm,clfm=cln/lfm,
+              fmsy=fbar/msy_harvest)[,c("f","CV","AR","M","s","k","bg","sel3","fmsy",
+            "sln","cln","sl50","cl50","slopt","clopt","slfm","clfm")]
+
+dat=melt(idx,id=c("f","CV","AR","M","s","k","bg","sel3","fmsy"))
+
+ggplot(dat)+
+  geom_boxplot(aes(ac(f),value))+
+  geom_hline(aes(yintercept=1),col="red")+
+  facet_wrap(~variable,ncol=2)+
+  xlab("F times FMSY")+ylab("Ratio with FMSY")
+```
+
+
+# References {#References}
+
+\newpage
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+
