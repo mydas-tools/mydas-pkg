@@ -29,12 +29,9 @@ hcrSBTD<-function(yrs,
                   control=FLPar(c(k1=0.25,k2=0.25,gamma=1)),
                   index,
                   catch,...){
+  
   lambda=as.FLQuant(ddply(transform(as.data.frame(index%/%apply(index,6,mean)),iter=as.numeric(ac(iter))), 
                           .(iter), with, data.frame(data=coefficients(lm(data~year))[2])))
-#lambda.<<-lambda
-#index. <<-index
-#control.<<-control
-#yrs<<-yrs
 
   flag =c(lambda<0)
   flag1=seq(dims(lambda)$iter)[ flag]
@@ -57,8 +54,6 @@ hcrSBTD<-function(yrs,
   dmns$iter=dimnames(index)$iter
   res      =FLQuant(rep(c(res),each=length(yrs)),dimnames=dmns)
   
-  chk=list(lambda=lambda,gain=gain,catch=catch,index=index,res=res) 
-  
-  chk<<-chk
-
+  #chk=list(lambda=lambda,gain=gain,catch=catch,index=index,res=res) 
+ 
   return(res)}

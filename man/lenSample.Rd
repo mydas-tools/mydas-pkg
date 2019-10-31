@@ -8,12 +8,12 @@
 \alias{lenSample,FLQuant,FLPar,numeric-method}
 \title{lenSample}
 \usage{
-lenSample(object, alk, nsample, ...)
+lenSample(object, invAlk, nsample, ...)
 }
 \arguments{
 \item{object}{\code{FLStock} blah,blah,blah,...}
 
-\item{alk}{\code{FLPar} with ALK}
+\item{invAlk}{\code{FLPar} with invAlk}
 
 \item{nsample}{\code{numeric} sample size, default is 500}
 
@@ -27,11 +27,11 @@ lenSample
 }
 \examples{
 \dontrun{
-lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],alk,nsample=100)
+lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],invAlk,nsample=100)
 }
 }
 \seealso{
-setALK
+setInvAlk
 }
 \author{
 Laurence Kell, Sea++

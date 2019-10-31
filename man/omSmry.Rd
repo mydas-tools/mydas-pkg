@@ -19,7 +19,7 @@ omSmry(x, y, z, ...)
 
 \item{y}{\code{FLBRP} or \code{FLPar} with reference points, optional}
 
-\item{z}{\code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default}
+\item{z}{\code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a=0.0003,b=3)} by default}
 
 \item{...}{any additional arguments}
 }

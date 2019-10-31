@@ -49,9 +49,9 @@ mseSBTD<-function(
   #Capacity, i.e. F in OM can not be greater than this
   nyrs  =5,
   cpueFn=ssb,
-  lag   =1,
-  maxF  =10){
-
+  lag   =0,
+  maxF  =1.5){
+print(paste(lag,maxF))
   ##So you dont run to the end then crash
   end=min(end,range(om)["maxyear"]-interval)
   

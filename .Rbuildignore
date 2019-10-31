@@ -1,6 +1,7 @@
 ^[.].*$
 ^.*/[.].*$
 R/ini.R
+R/cc.R
 ^.*\.Rproj$
 ^\.Rproj\.user$
 vignettes
@@ -13,3 +14,4 @@ demo/mse-mpb.R
 demo/mse-sra.R
 demo/mse-xsa.R
 demo/00index
+

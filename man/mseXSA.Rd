@@ -11,7 +11,7 @@ mseXSA(om, eq, mp, control, rf = "missing", ftar = 1, fmin = 0.05,
   interval, sr_deviances = rlnoise(dim(om)[6], FLQuant(0, dimnames =
   list(year = start:(end + interval))), 0.3),
   u_deviances = rlnoise(dim(mp)[6], FLQuant(0, dimnames =
-  dimnames(iter(stock.n(om), 1))), 0.2), maxF = 1, whitebox = FALSE)
+  dimnames(iter(stock.n(om), 1))), 0.2), maxF = 1)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}
@@ -45,8 +45,6 @@ mseXSA(om, eq, mp, control, rf = "missing", ftar = 1, fmin = 0.05,
 \item{u_deviances}{\code{FLQuant} rlnoise(dim(mp)[6],FLQuant(0,dimnames=dimnames(iter(stock.n(om),1))),0.2),}
 
 \item{maxF}{\code{numeric} 1.0 Capacity, i.e. F in OM can not be greater than this}
-
-\item{whitebox}{\code{boolean} FALSE}
 }
 \description{
 MSE with XSA as the stock assessment in the management procedure

@@ -7,7 +7,7 @@
 #' @name omSmry
 #' @param x \code{FLStock}  blah,blah,blah,...
 #' @param y \code{FLBRP} or \code{FLPar} with reference points, optional 
-#' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a-0.001,b=3)} by default
+#' @param z \code{FLPar} with `a` and `b` of length weight relationship \code{FLPar(a=0.0003,b=3)} by default
 #' @param ... any additional arguments
 #' 
 #' @docType methods
@@ -34,21 +34,26 @@
 setGeneric('omSmry', function(x,y,z,...) standardGeneric('omSmry'))
 
 setMethod('omSmry', signature(x="FLStock",y="missing","z"="missing"),
-          function(x,y="missing",z=FLPar(a=0.001,b=3),...)
+          function(x,y,z,...){
             
-            omSmryFn(x,y,z))
+            omSmryFn(x)})
 
 setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="missing"),
-          function(x,y=y,z=FLPar(a=0.001,b=3),...)
+          function(x,y=y,z=FLPar(a=0.0003,b=3),...)
             
             omSmryFn(x,y,z))
 
 setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="FLPar"),
           function(x,y,z,...)
-            
+
             omSmryFn(x,y,z))
 
-omSmryFn<-function(x,y="missing",z=FLPar(a=0.001,b=3)){
+setMethod('omSmry', signature(x="FLStock",y="FLPar","z"="missing"),
+          function(x,y,z,...)
+            
+            omSmryFn(x,y="missing",z=y))
+
+omSmryFn<-function(x,y="missing",z=FLPar(a=0.0003,b=3)){
   
   nms=c("iter","year","ssb","stock","rec","catch","catchjuv","fbar",
         "crash_harvest","virgin_rec","virgin_ssb","msy_harvest","msy_ssb","msy_yield","rec_hat",

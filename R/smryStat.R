@@ -3,10 +3,10 @@
 #Discounted yield
 #AAV in yield
 
-avFn<-function(object){
+avFn<-function(object,lag=1){
   
-  o1 =object[-length(object)]
-  o2 =object[-1]
+  o1 =object[-seq(length(object)-lag+1,length(object),1)]
+  o2 =object[-seq(lag)]
   
   return(abs((o2-o1)/o1))}
 
@@ -58,14 +58,18 @@ randomness=function(obj) {
   #                 data.frame(data=difference.sign.test(data)[["p.value"]])))
   difference.sign.test(obj)[["p.value"]]}
 
+
 smryStat<-function(dat,dr=0){
-  with(dat, data.frame(safety  =min(rec_hat/virgin_rec,na.rm=T),
-                       blim    =mean(ssb/virgin_ssb,na.rm=T),
-                       ftar    =min(fbar/msy_harvest,na.rm=T),
-                       btar    =min(ssb/msy_ssb,na.rm=T),
-                       kobe    =green((ssb/msy_ssb>1)&(fbar/msy_harvest<1),year)[1:2],
-                       yield   =dRate(catch/msy_yield,dr)/length(catch),
-                       yieldAav=mean(avFn(pmax(catch,msy_yield*0.1))),
-                       yieldRnd=randomness(catch),
-                       ssbRnd  =randomness(ssb),
-                       fbRnd   =randomness(fbar)))}
+  with(dat, data.frame(safety   =min(rec_hat/virgin_rec,na.rm=T),
+                       blim     =mean(ssb/virgin_ssb,na.rm=T),
+                       plim     =mean(ssb>0.5*msy_ssb,na.rm=T),
+                       ftar     =min(fbar/msy_harvest,na.rm=T),
+                       btar     =min(ssb/msy_ssb,na.rm=T),
+                       kobe     =green((ssb/msy_ssb>1)&(fbar/msy_harvest<1),year)[1:2],
+                       yield    =dRate(catch/msy_yield,dr)/length(catch),
+                       yieldAav =mean(avFn(pmax(catch,msy_yield*0.1),1)),
+                       yieldAav2=mean(avFn(pmax(catch,msy_yield*0.1),2)),
+                       yieldAav3=mean(avFn(pmax(catch,msy_yield*0.1),3)),
+                       yieldRnd =randomness(catch),
+                       ssbRnd   =randomness(ssb),
+                       fbRnd    =randomness(fbar)))}

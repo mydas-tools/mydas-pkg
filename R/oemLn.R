@@ -1,57 +1,60 @@
+
+
 utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 
-#' alk
+#' invAlk
 #' 
-#' @title alk
+#' @title invAlk
 #' 
 #' @description Create an Age Length key, i.e. probability of a fish of a given age being in 
 #' a length bin, can be used to sample length frequency distributions
 #' 
 #' @author Laurence Kell, Sea++
 #' 
-#' @name alk
+#' @name invAlk
 #' @param object \code{FLPar} with `linf` or  \code{numeric}
 #' @param ... any additional arguments
 # #' @param age \code{numeric} 0:40 by default
-# #' @param cv  \code{numeric} 0.2 by default
-# #' @param lmax  \code{numeric} maximum size relative to 'linf' 1.2 by default
+# #' @param cv  \code{numeric} 0.1 by default
+# #' @param lmax  \code{numeric} maximum size relative to 'linf' 1.25 by default
 #'  
-#' @aliases alk alk-method alk,FLPar-method
+#' @aliases invAlk invAlk-method invAlk,FLPar-method
 #' 
 #' @docType methods
-#' @export alk
+#' @export invAlk
 #'  
-#' @rdname alk
+#' @rdname invAlk
 #' @seealso lenSample
 #' 
 #' @examples
 #' \dontrun{
-#' ak=alk(FLPar(linf=50))
+#' ak=invAlk(FLPar(linf=50))
 #' }
-setGeneric('alk', function(object,...) standardGeneric('alk'))
+setGeneric('invAlk', function(object,...) standardGeneric('invAlk'))
 
-setMethod('alk', signature(object="FLPar"),
-          function(object,age=0:40,cv=0.2,lmax=1.2,...)
+setMethod('invAlk', signature(object="FLPar"),
+          function(object,age=0:40,cv=0.1,lmax=1.25,...)
             
-            setALKFn(object,age,cv,lmax))
+            setInvAlkFn(object,age,cv,lmax))
 
-setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
+setInvAlkFn<-function(par,age=0:40,cv=rep(0.1,length(age)),lmax=1.2){
   
-  alk=mdply(data.frame(age=age), function(age,par,cv,lmax){
+  invAlk=mdply(data.frame(age=age,cv=cv), function(age,cv,par,lmax){
     res=adply(par,2,function(x,age,cv,lmax){
         bin =seq(1:ceiling(x["linf"]*lmax))
         len=vonB(age,x)
-        p  =c(pnorm(1,len,len*cv),
-              dnorm(bin[-c(1,length(bin))],len,len*cv),
-              pnorm(bin[length(bin)],len,len*cv,lower.tail=FALSE))
+        sd=len*cv
+        p  =c(pnorm(1,len,sd),
+              dnorm(bin[-c(1,length(bin))],len,sd),
+              pnorm(bin[length(bin)],len,sd,lower.tail=FALSE))
   
         data.frame(len=bin,p=p/sum(p))},
-      age=age,cv=cv,lmax=lmax)},par=par,cv=cv,lmax=lmax)
+      age=age,cv=cv,lmax=lmax)},par=par,lmax=lmax)
   
-  alk=cast(alk,age~len~iter,fun=sum,value="p")
-  alk=FLPar(array(alk,dim=unlist(llply(dimnames(alk),length)),dimnames=dimnames(alk)))
+  invAlk=cast(invAlk,age~len~iter,fun=sum,value="p")
+  invAlk=FLPar(array(invAlk,dim=unlist(llply(dimnames(invAlk),length)),dimnames=dimnames(invAlk)))
   
-  alk}
+  invAlk}
 
 #' lenSample
 #' 
@@ -63,7 +66,7 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 #' @name lenSample
 #' 
 #' @param object \code{FLStock} blah,blah,blah,...
-#' @param alk \code{FLPar} with ALK
+#' @param invAlk \code{FLPar} with invAlk
 #' @param nsample \code{numeric} sample size, default is 500
 #' @param ... any additional arguments
 #' 
@@ -71,7 +74,7 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 #' 
 #' @export lenSample
 #' @rdname lenSample
-#' @seealso setALK
+#' @seealso setInvAlk
 #' 
 #' @aliases lenSample  
 #'          lenSample-method  
@@ -80,26 +83,41 @@ setALKFn<-function(par,age=0:40,cv=0.2,lmax=1.2){
 #' 
 #' @examples
 #' \dontrun{
-#' lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],alk,nsample=100)
+#' lfd=lenSample(catch.n(ple4)[,ac(2000:2005)],invAlk,nsample=100)
 #' }
-setGeneric('lenSample', function(object,alk,nsample,...) standardGeneric('lenSample'))
+setGeneric('lenSample', function(object,invAlk,nsample,...) standardGeneric('lenSample'))
 
-setMethod('lenSample', signature(object="FLQuant",alk="FLPar",nsample="missing"),
-          function(object,alk,nsample=500,...)
+setMethod('lenSample', signature(object="FLQuant",invAlk="FLPar",nsample="missing"),
+          function(object,invAlk,nsample=500,...)
             
-            lenSampleFn(object,alk,nsample))
-setMethod('lenSample', signature(object="FLQuant",alk="FLPar",nsample="numeric"),
-          function(object,alk,nsample,...)
-            
-            lenSampleFn(object,alk,nsample))
+            lenSampleFn(object,invAlk,nsample))
 
-lenSampleFn<-function(object,alk,nsample){
+setMethod('lenSample', signature(object="FLQuant",invAlk="FLPar",nsample="numeric"),
+          function(object,invAlk,nsample,...)
+            
+            lenSampleFn(object,invAlk,nsample))
+
+lenSampleFn<-function(object,invAlk,nsample){
   
   res=mdply(expand.grid(iter=seq(dim(object)[6]),year=seq(dim(object)[2])),
          function(iter,year){ 
-            lfd=object[,year,,,,iter]%*%alk[,,iter,drop=T]
-            data.frame(length=dimnames(lfd)[[2]],data=apply(rmultinom(nsample,1,prob=lfd),1,sum))})
+            lfd=object[,year,,,,iter]%*%invAlk[,,min(iter,dim(invAlk)[3]),drop=T]
+            data.frame(len=dimnames(lfd)[[2]],data=apply(rmultinom(nsample,1,prob=lfd),1,sum))})
 
+  res=as.FLQuant(res)
+  dimnames(res)[2:6]=dimnames(object)[2:6]
+  res}
+
+lenSampleFn2<-function(object,invAlk,nsample){
+  
+  res=mdply(expand.grid(iter=seq(dim(object)[6]),year=seq(dim(object)[2])),
+            function(iter,year){ 
+              lfd=object[,year,,,,iter]%*%invAlk[,,min(iter,dim(invAlk)[3]),drop=T]
+              lfd2=lfd
+              lfd2[]=1/sum(dim(lfd)[2])
+              res=data.frame(len=dimnames(lfd)[[2]],data=apply(rmultinom(nsample,1,prob=lfd2),1,sum))
+              mutate(cbind(res,p=t(lfd)),len=len,data=data*p)[,-3]})
+  
   res=as.FLQuant(res)
   dimnames(res)[2:6]=dimnames(object)[2:6]
   res}
@@ -111,12 +129,79 @@ if (FALSE){
   library(dplyr)
 
   load("/home/laurence/Desktop/sea++/mydas/tasks/task4/data/turbot.RData")
-  alk=alk(FLPar(lh[,1]))
-  lfd=lenSample(stock.n(om)[,95:100,,,,1:2],alk,nsample=5000)
+  invAlk=invAlk(FLPar(lh[,1]))
+  lfd=lenSample(stock.n(om)[,95:100,,,,1:2],invAlk,nsample=5000)
     
   ggplot(melt(lfd))+
     geom_histogram(aes(Var.3,weight=value),binwidth=1)+
     facet_grid(year~iter)+
     xlab("Length (cm)")+ylab("Frequency")+
     scale_x_continuous(limits=c(0,45))  
-  }
+}
+
+#' mode
+#' 
+#' @description 
+#'  For a vector with labels corresponding to intervals i.e. \code{"(0,10]"}
+#'  returns a data.frame with left and right boundaries and mid point.
+#'      
+#' @param x; a vector of with intervals as names 
+#' @return a \code{data.frame} with left and right boundaries and mid points.
+#' @export
+#' @docType functions
+#' @rdname lk-funcs
+#' 
+#' @examples
+#' x=summary(cut(runif(100),seq(0,1,.1)))
+#' unbin(x)
+unbin=function(x){
+  left =as.numeric(substr(x,2,unlist(gregexpr(",",x))-1))
+  right=as.numeric(substr(x,  unlist(gregexpr(",",x))+1,nchar(x)-1))
+  mid  =(left+right)/2
+  
+  data.frame(left=left,right=right,mid=mid,n=x)}
+
+lmode<-function(len,n,bin=25) {
+  
+  dat=data.frame(bin=cut(len,breaks=bin),n=n)
+  res=ddply(dat,.(bin), with, data.frame(freq=sum(n)))
+  res=as.character(subset(res,freq==max(freq))[1,"bin"])
+  unbin(res)$mid}
+
+lenInd<-function(len,n,wt="missing",lopt=NA){
+  
+  lopt=lopt[1]
+  
+  # L95 95th percentile
+  l95=weighted.quantile(len,n,probs=0.95)
+  
+  # L25 25th percentile of length distribution
+  l25=weighted.quantile(len,n,probs=0.25)
+  
+  # Lmax5 mean length of largest 5%
+  lmax5=weighted.mean(len,n*(len>=l95))
+  
+  # Lmega 
+  pmega=NA
+  if (!is.na(lopt)){
+    lmega=lopt*1.1
+  
+    # Pmega Proportion of indiv$iduals above $L_{opt} + 10\%$
+    pmega=sum(n*(len>=lmega))/sum(n)
+    }
+  
+  
+  # Lc Length at 50\% of modal abundance
+  lc=lmode(len,n)*0.5
+  lmean=weighted.mean(len,n*(len>=lc))
+
+  lbar=weighted.mean(len,n)
+  
+  lmaxy=NA
+  if (!missing(wt))
+    lmaxy=lmode(len,n*wt)
+  
+  res=c(l95=l95,l25=l25,lmega=lmega,lmax5=lmax5,pmega=pmega,lmean=lmean,lbar=lbar,lmaxy=lmaxy,lc=lc)
+  names(res)=c("l95","l25","lmega","lmax5","pmega","lmean","lbar","lmaxy","lc")
+  
+  res}

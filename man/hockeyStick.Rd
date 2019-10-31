@@ -23,7 +23,6 @@ bndTac \code{vector} with bounds (i.e. min and max values) on iter-annual variab
 stkYrs numeric vector with years for calculating stock status, max(as.numeric(dimnames(stock(object))$year)),
 refYrs numeric vector with years for calculating reference points, max(as.numeric(dimnames(catch(object))$year)),
 hcrYrs numeric vector with years for setting management, max(as.numeric(dimnames(stock(object))$year)),
-tacMn \code{logical} should the TACs be the average of the values returned?
 maxF  =2 numeric vector specifying maximum relative F}
 
 \item{...}{any additional arguments}
