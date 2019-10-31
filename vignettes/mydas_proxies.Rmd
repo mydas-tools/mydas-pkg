@@ -1,0 +1,145 @@
+---
+title: "Selection of Stock Assessment Methods and Proxy Reference Points for use in Management Procedures"
+subtitle: "Comparison of Proxies with MSY Reference Points"
+author: "L Kell"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+To provide advice on the status of data poor stocks ICES uses $MSY$ proxy reference points as part of a Precautionary Approach. Proxy reference point should be robust to uncertainty i.e. they should be able to detect with sufficient power whether a stock is below $B_{MSY}$ (over fished) or fishing mortality greater than $F_{MSY}$ (over fishing).
+
+To identify robust proxy reference point therefore requires identifying the impact of the assumptions and  knowledge on the relationship between the proxies and their data rich equivalents. To do this we use life history parameters based on turbot to compute and then compare $F_{MSY}$ and proxy reference points.
+
+
+```{r, knitr, eval=TRUE, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(knitr)
+
+opts_chunk$set(comment   =NA, 
+               warning   =FALSE, 
+               message   =FALSE, 
+               error     =FALSE, 
+               echo      =FALSE,
+               fig.width =10, 
+               fig.height=10,
+               cache     =TRUE, 
+               fig.path  ="tex/proxies-",
+               cache.path="cache/proxies/")
+
+iFig=0
+iTab=0
+```
+```{r, pkgs} 
+library(FLCore)
+library(FLife)
+library(mydas)
+
+library(popbio)
+library(plyr)
+library(dplyr)
+library(reshape)
+library(GGally)
+```
+
+
+```{r, params}
+data(teleost)
+lh=lhPar(teleost[,"Psetta maxima"])
+lh=propagate(lh,8)
+
+dat=as(expand.grid(sel3=c(5000,5),
+                   s   =c(0.75,0.9),
+                   k   =0.28*c(1,0.5)),"FLPar")
+lh[c("sel3","s","k")]=dat[c("sel3","s","k")]
+```
+
+```{r, smry}
+smry=popdyn(lh)
+```
+
+```{r, smry.lorenzen}
+lh.lorenzen=lh
+lh.lorenzen[c("m1","m2","m3")]=FLife:::mPar("lorenzen")
+
+growth=FLife:::vonB
+eq=lhEql(lh.lorenzen,m="lorenzen")
+smry.lorenzen=popdyn(lh.lorenzen,eq)
+```
+
+# Figures
+
+## MSY reference points and proxies
+
+```{r}
+dat=rbind(cbind(M="Gislason",model.frame(smry)),
+          cbind(M="Lorenzen",model.frame(smry.lorenzen)))
+save(dat,file="/home/laurence/Desktop/sea++/mydas/project/tasks/task6/wklifeIX/dat.RData")
+```
+
+```{r, lifeHistory}
+ggpairs(dat[,c("M","fmsy","bmsy","msy","r","rc")],
+        mapping = ggplot2::aes(color=as.character(M)),
+        lower = list(continuous = wrap(mydas:::my_smooth)),
+        diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),
+        title = "")+
+  theme(legend.position ="none",
+        panel.grid.major =element_blank(),
+        axis.ticks       =element_blank(),
+        axis.text.x      =element_blank(),
+        axis.text.y      =element_blank(),
+        panel.border     =element_rect(linetype = 1, colour="black", fill=NA))+
+  theme_bw(16)
+```
+
+
+**Figure `r iFig=iFig+1; iFig`.**  Relationship between MSY reference points and population growth rate.
+
+
+```{r, proxies, fig.height=12, fig.width=12}
+ggpairs(dat[,c("M","lopt","clmsy","slmsy","mk","fm","lfm","spr0","fmsy")],
+        mapping = ggplot2::aes(color=as.character(M)),
+        lower = list(continuous = wrap(mydas:::my_smooth)),
+        diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),  
+        title = "")+
+  theme(legend.position ="none",
+        panel.grid.major =element_blank(),
+        axis.ticks       =element_blank(),
+        axis.text.x      =element_blank(),
+        axis.text.y      =element_blank(),
+        panel.border     =element_rect(linetype = 1, colour="black", fill=NA))+
+  theme_bw(24)
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Relationship between MSY reference points and their potential proxies.
+
+
+```{r, len-indicators, eval=FALSE}
+idx=transform(merge(ind,refs[,c("slmsy","clmsy","lopt","lfm","iter")]),
+              sln=sln/slmsy,cln=cln/clmsy,
+              sl50=sln/l50,cl50=cln/l50,
+              slopt=sln/lopt,clopt=cln/lopt,
+              slfm =sln/lfm,clfm=cln/lfm,
+              fmsy=fbar/msy_harvest)[,c("f","CV","AR","M","s","k","bg","sel3","fmsy",
+            "sln","cln","sl50","cl50","slopt","clopt","slfm","clfm")]
+
+dat=melt(idx,id=c("f","CV","AR","M","s","k","bg","sel3","fmsy"))
+
+ggplot(dat)+
+  geom_boxplot(aes(ac(f),value))+
+  geom_hline(aes(yintercept=1),col="red")+
+  facet_wrap(~variable,ncol=2)+
+  xlab("F times FMSY")+ylab("Ratio with FMSY")
+```
+
+
+# References {#References}
+
+\newpage
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+

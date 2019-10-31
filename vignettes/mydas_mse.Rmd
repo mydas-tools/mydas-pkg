@@ -1,6 +1,6 @@
 ---
 title: "Management Strategy Evaluation using **FLife**"
-subtitle: "Data Rich and Poor Management Procedu"
+subtitle: "Data Rich and Poor Management Procedures"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:

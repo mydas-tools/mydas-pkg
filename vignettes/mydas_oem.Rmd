@@ -1,5 +1,6 @@
 ---
-title: "Observation Error Model for Data Limited Stocks"
+title: "MyDas"
+subtitle: "Observation Error Model for Data Limited Stocks"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -14,9 +15,8 @@ license: Creative Commons Attribution-ShareAlike 4.0 International Public Licens
 
 ```{r, ini, echo=FALSE, results='hide', message=FALSE, warnings=FALSE, cache=FALSE,eval=!TRUE}
 library(knitr)
-source("R/ini.R")
+#source("R/ini.R")
 ```
- 
  
 ```{r knitr_init, echo=FALSE, results="hide",eval=TRUE}
 library(knitr)
@@ -31,97 +31,11 @@ opts_chunk$set(echo    =!TRUE,
                tidy    =FALSE,
                warnings=FALSE,
                fig.height=4.5,
-               fig.width =4.5,
+               fig.width =6,
                fig.path  ="tex/oem-")
+iFig=0
 ```
 
-```{r}
-library(FLCore)
-library(FLBRP)
-library(FLasher)
-library(FLife)
-
-library(mydas)
-```
-
-
-```{r, cpue, echo=!TRUE, eval=TRUE}
-setGeneric("cpue", function(object, ...) standardGeneric("cpue"))
-
-setMethod('cpue',   signature(object='FLStock'),
-  function(object, sel=catch.sel(object), effort = c("f","h"), mass = TRUE) {
-
-    if (effort[1] == "h")
-      E <- catch(object) %/% stock.n(object)
-    else  
-      E <- fbar(object)
-    
-    cpue <- (catch.n(object) %*% sel) %/% E
-
-  if (mass)
-    cpue <- cpue * catch.wt(object)
-
-  return(cpue)
-  }
-)
-```
-
-```{r, om, echo=FALSE}
-#source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
-
-lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
-
-lh=lhPar(lh)  
-
-eq=lhEql(lh)
-
-gTime=c(round(gt(eq)))
-
-fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                                 seq(.1,2,length.out=30),
-                                                 seq(2,1.0,length.out=gTime)[-1],
-                                                 rep(1.0,61)))[,1:105]
-om=as(eq,"FLStock")
-
-om=fwd(om,f=fbar(om)[,-1], sr=eq)
-```
-
-```{r, survey, echo=TRUE, eval=TRUE}
-# survey
-setGeneric("survey", function(object, ...) standardGeneric("survey"))
-
-setMethod("survey",   signature(object="FLStock"),
-  function(object, sel=stock.n(object) %=% 1, wt=stock.wt(object), timing = 0.5, mass = FALSE) {
-  
-    timing <- pmax(pmin(timing, 1.0), 0.0)
-
-    #
-    stock.n <- stock.n(object) * exp(-(harvest(object) * timing - m(object) * timing))
- 
-    cpue <- stock.n %*% sel
-  
-    if (mass)
-    cpue <- cpue %*% wt
-
-  return(cpue)})
-```
-
-```{r, hyperstability, eval=TRUE}
-hyperstability<-function(object,omega=1,ref=apply(object,c(1,3:6),mean)) 
-  ref%*%((object%/%ref)^omega)
-```
-
-```{r, trend, eval=TRUE}
-trend<-function(object,bias=0.02) 
-  FLQuant(cumprod(1+rep(bias,dim(object)[2])),dimnames=dimnames(object))
-```
-
-```{r, pkgs, echo=FALSE, message=FALSE}
-library(ggplot2)
-
-theme_set(theme_bw())
-options(digits=3)
-```
 
 [](#top)
 
@@ -129,164 +43,243 @@ options(digits=3)
 
 [Installation](#Installation)
 
-[Quick Start](#QuickStart)
-
 [Examples](#Examples)
 
 [More information](#More information)
 
 [References](#References)
 
+
 # Introduction {#Introduction}
 
-In Management Strategy Evaluation (MSE) an Operating Model (OM) is used to simulate resource dynamics in trials in order to evaluate the performance of a Management Procedure (MP). Where the MP is the combination of pre-defined data, together with an algorithm to which such data are input to provide a value for a management control measure. 
+In Management Strategy Evaluation (MSE) an Operating Model (OM) is used to simulate resource dynamics to evaluate the performance of a Management Procedure (MP). Where the MP is the combination of pre-defined data, together with an algorithm to which such data are input to provide a value for a management control measure. 
 
-The link between the OM and the MP is the Observation Error Model (OEM), which generates fishery-dependent or independent resource monitoring data. The OEM reflects the uncertainties, between the actual dynamics of the resource and perceptions arising from observations and assumptions by modelling the differences between the measured value of a resource index and the actual value in the OM. 
+The link between the OM and the MP is the Observation Error Model (OEM), which generates fishery-dependent or independent resource monitoring data. The OEM models the uncertainties due to sampling and limited data. 
 
-[Back to Top](#top)
-
-# Installation {#Installation}
-
-The simplest way to obtain mpb is to install it from CRAN by using the following command in the R console:
-
-```{r install, eval=FALSE}
-install.packages("mpb", repos = "http://flr-project.org/R")
-```
-
-The repos options can be changed depending on personal preferences and includes options such as choosing the directories in which to install the packages see help(install.packages) for more details.
 
 [Back to Top](#top)
 
-# Quick Start {#QuickStart}
+# Installation
 
-So that users may have a better idea of what functions are available, which one to choose, or where to seek help, this section provides a general overview of the package. In particular it highlights the various elements, what they do, and provides some examples of usage. More details are given in later sections.
+To run the code in this vignette a number of packages need to be installed, both from CRAN and 
+[FLR](http://www.flr-project.org), where  [tutorials](https://www.flr-project.org/doc/) are available.
 
-First, load the `kobe` package:
 
-```{r lib,echo=TRUE, eval=TRUE}
-library(ggplot2)
-library(FLCore)
-library(ggplotFL)
-library(FLife)
+## Load Libraries
+
+### CRAN
+All the examples make extensive use of the packages of [Hadley Wickham](http://hadley.nz/)
+
+```{r}
 library(plyr)
+library(reshape)
+library(ggplot2)
 ```
 
-Example dataset for North Sea plaice.
+### FLR
 
-```{r data,echo=TRUE, eval=TRUE}
-data(ple4)
+The FLR packages can be installed from  [www.flr-project.org](http://www.flr-project.org)
+
+```{r, eval=FALSE}
+install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
+             repos="http://flr-project.org/R")
 ```
 
-### Plotting
+```{r}
+library(FLCore)
+library(FLasher)
+library(FLBRP)
+library(FLife)
+```
 
-Plotting is done using `ggplot2` which provides a powerful alternative paradigm for creating both simple and complex plots in R using the ideas the *Grammar of Graphics* ^[Wilkinson, L. 1999. *The Grammar of Graphics*, Springer. [doi 10.1007/978-3-642-21551-3_13](http://dx.doi.org/10.1007/978-3-642-21551-3_13).] The idea of the grammar is to specify the individual building blocks of a plot and then to combine them to create the graphic desired^[<http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html>].
+### Devtools
 
-The `ggplot` functions expects a `data.frame` for its first argument, `data`; then a geometric object `geom` that specifies the actual marks put on to a plot and an aesthetic that is "something you can see" have to be provided. Examples of geometic Objects (geom) include points (geom_point, for scatter plots, dot plots, etc), lines (geom_line, for time series, trend lines, etc) and boxplot (geom_boxplot, for, well, boxplots!). Aesthetic mappings are set with the aes() function and, examples include, position (i.e., on the x and y axes), color ("outside" color), fill ("inside" color), shape (of points), linetype and size. 
+The MyDas package has various methods for conditioning OMs, generating pseudo data and simulation testing data-limited stock assessment methods. As `mydas`  is still being developed, it is currently best installed from its [GitHub repository](https://github.com/lauriekell/mydas-pkg). It can be installed using the `devtools` package, (RTools)[https://cran.r-project.org/bin/windows/Rtools/] also needs to be installed, see (guide)[https://www.coursera.org/lecture/data-scientists-tools/installing-rtools-ecVeq].
 
-The phase plot plots stock status against fishing mortality relative to target reference points as a two-dimensional phase plot. 
+```{r, eval=FALSE}
+install.packages("devtools",dependencies=TRUE)
+```
+
+The `mydas` pakage can then be installed.
+
+```{r, echo=TRUE, eval=FALSE}
+library(devtools)
+
+devtools::install_github("lauriekell/mydas-pkg")
+```
+
+```{r, echo=TRUE}
+library(mydas) 
+```
 
 [Back to Top](#top)
 
-# Examples {#Examples}
+# Example
 
+## Operating Model
 
-Create an index aggregated over ages
-```{r example1,echo=TRUE, eval=TRUE}
-#oem<-function(x) 
-#apply(catch.wt(x)%*%catch.n(x),2,sum)%/%fbar(x)
+Create an Operating Model by specifying the life histoy parameters and filling in any missing values 
 
-oem(ple4)
+```{r, om-lh}
+lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0,l50=43.25),units="NA")
+
+lh=lhPar(lh)   
 ```
 
 
-```{r plot,echo=TRUE, eval=TRUE}
-plot(FLQuants(ple4,"Stock"=stock,
-                   "Survey"=function(x) apply(survey(x,timing=0,mass=TRUE),2,sum),
-                   "CPUE"  =function(x) apply(  cpue(x),2,sum)))
+Then create an `FLBRP` object that represents the equilibrium, i.e. expected dynamics and reference points.
+
+```{r, om-eql, echo=TRUE}
+eq=lhEql(lh)
 ```
 
-The age structure can be shaped by `sel`, e.g. for a survey of mature individuals
+Simulate a exploitation history and current depletion level.
 
-```{r plot-2,echo=TRUE}
-ggplot(apply(survey(ple4,sel=mat(ple4)),2,sum))
+The stock was originally underexploited, then effort increased until the stock was over fished at 2$F_{MSY}$. At which point a recovery plan was implemented, where F was reduced to $F_{MSY}$ in 1 generation time, after which the stock was exploited at $F_{MSY}$  
+
+```{r, om-f, fig.height=3, fig.width=6, echo=TRUE}
+gTime=c(round(gt(eq))) 
+
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                                 seq(.1,2,length.out=30),
+                                                 seq(2,1.0,length.out=gTime)[-1],
+                                                 rep(1.0,61)))[,1:105]
+plot(fbar(eq))
 ```
 
-Trends in q and hyperstability can be specified
+**Figure `r iFig=iFig+1; iFig`** Exploitation History.
 
-```{r plot-3,echo=TRUE}
-ggplot(apply(survey(ple4,sel=mat(ple4)),2,sum))
-```
 
-## Uncertainty
-```{r example2,echo=TRUE, eval=TRUE}
-cv=rlnorm(100,log(stock(ple4)),0.3)
-ggplot(cv)+
-  geom_boxplot(aes(factor(year),data))
-```
+```{r}
+om=as(eq,"FLStock")
 
-## Age structure
-```{r example4,echo=TRUE,eval=TRUE}
-sel  =apply(harvest(ple4),1,mean)
-ggplot(sel)+
-  geom_line(aes(age,data))
-```
+om=fwd(om,f=fbar(om)[,-1], sr=eq)
 
-## Trends
-```{r example3,echo=TRUE,eval=TRUE}
-q    =FLQuant(cumprod(1+rep(.02,dim(fbar(ple4))[2])),dimnames=dimnames(fbar(ple4)))
-plot(q)
-```
-
-## Hyperstability
-```{r example5,echo=TRUE,eval=TRUE}
-cpue   =stock(ple4)/mean(stock(ple4))
-stable =cpue^0.1
-deplete=cpue^2
-
-plot(FLQuants("CPUE"          =cpue,
-              `Hyper_Stable`  =stable,
-              `Hyper_Depleted`=deplete))
+plot(om)
 ```
 
 
-```{r example7,echo=TRUE,eval=TRUE}
-trend=FLQuant(seq(1,2,length.out=dim(stock(ple4))[2]),dimnames=dimnames(stock(ple4)))
-var  =trend*abs(cv)*sign(cv)
+## Catch per unit effort
 
-ggplot(FLQuants("Log Normal" =cv,
-                "Trend in CV"=var))+
-  geom_boxplot(aes(factor(year),data))+
-  facet_grid(qname~.)
+An unbiased index of total biomass
+```{r, survey, fig.height=4}
+plot(stock(om))
 ```
 
-```{r example8,echo=TRUE,eval=TRUE}
-bias=FLPar(omega=1,ref=mean(stock(ple4)),q=0)
+**Figure `r iFig=iFig+1; iFig`** Stock biomass
 
+
+```{r, cpue, fig.height=6}
+plot(FLQuants(om,Survey=stock,
+                 CPUE=function(x) catch(x)/fbar(x)))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Comparison between unbiased survey and catch per unit effort
+
+```{r, cpue2, fig.height=4, fig.width=6}
+library(plyr)
+
+dat=as.data.frame(FLQuants(om,Survey=stock,
+                 CPUE=function(x) catch(x)/fbar(x)))
+dat=ddply(dat,.(qname), transform, index=data/mean(data))
+ggplot(dat)+geom_line(aes(year,index,col=qname))+
+  theme(legend.position="bottom")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Comparison between unbiased survey and catch per unit effort
+
+### Effort creep
+
+Model an increase in catchabilty, e.g. due to an increase in catchability.
+
+```{r, trend, eval=TRUE}
+trend<-function(object,bias=0.02) 
+  object%*%FLQuant(cumprod(1+rep(bias,dim(object)[2])),dimnames=dimnames(object))
+```
+
+
+```{r}
+plot(FLQuants(stock(om)%=%1,trend(stock(om)%=%1)))
+```
+
+**Figure `r iFig=iFig+1; iFig`** 2% increase per year in catchability.
+
+
+```{r}
+plot(FLQuants(catch(om)%/%fbar(om),trend(catch(om)%/%fbar(om))))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Effect of a 2% increase per year in catchability on CPUE.
+
+### Hyperstabilty
+
+[Hyperstability](https://blog.nature.org/science/2016/05/11/hyperstability-the-achilles-heel-of-data-poor-fisheries/) is when catch rate stays stable while the actual fish population declines. 
+
+```{r, hyperstability, eval=TRUE}
 hyperstability<-function(object,omega=1,ref=apply(object,c(1,3:6),mean)) 
   ref%*%((object%/%ref)^omega)
-
-bias<-function(object,bias=0.02) 
-     FLQuant(cumprod(1+rep(bias,dim(object)[2])),dimnames=dimnames(object))
-
 ```
+
+```{r, hyper, fig.height=4}
+om2=window(om,start=25,end=50)
+
+plot(catch(om2)%/%fbar(om2))+
+  geom_line(aes(year,data),
+            data=as.data.frame(hyperstability(catch(om2)%/%fbar(om2),omega=0.5)),col="red")
+```
+
+
+**Figure `r iFig=iFig+1; iFig`** Effect of hyperstabilty (red), the stock appears to decline less. 
+
+
+It is possible to develop indices tailored to different case studies
+
+```{r plot,echo=TRUE, eval=TRUE}
+plot(FLQuants(om,"Stock"   =stock,
+                 "Adults"   =ssb,
+                 "Recruits" =rec,
+                 "Juveniles"=function(x) stock(x)-ssb(x),
+                 "CPUE"     =function(x) catch(x)%/%fbar(x)))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Different indices of abundance. 
+
+
+# Uncertainty
+
+```{r example2, fig.height=4, echo=TRUE, eval=TRUE}
+cv=rlnorm(100,log(stock(om)),0.3)
+plot(cv, iter=1)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Measurement error, the red line is a single realisation. 
+
+
+```{r example3, fig.height=4, echo=TRUE, eval=TRUE}
+cv=rlnoise(100,log(stock(om)),0.3,0.8)
+plot(cv, iter=1)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Measurement error with auto-correlation, the red line is a single realisation. 
+
+
 
 ```{r example9,echo=TRUE,eval=TRUE}
 set.seed(1234)
-u     =FLQuants("Unbiased"      =rlnorm(100,log(apply(oem(ple4),2:6,sum)),.3),
-                "Hyperstability"=rlnorm(100,log(apply(oem(ple4),2:6,sum)%*%
-                                                  hyperstability(stock(ple4),0.52)),.3),
-                "Trend"         =rlnorm(100,log(apply(oem(ple4),2:6,sum)%*%bias(stock(ple4),0.02)),.3),
-                "AR"            =apply(oem(ple4),2:6,sum)%*%
-                                   exp(rnoise(100,apply(oem(ple4),2:6,sum)*0,.3,b=.7)),
-                "Variable"      =var,
-                "Juvenile"      =rlnorm(100,log(apply(oem(ple4,sel=mat(ple4)),2:6,sum)),.3),
-                "Mature"        =rlnorm(100,log(apply(oem(ple4,sel=1-mat(ple4)),2:6,sum)),.3),
-                "Numbers"       =rlnorm(100,log(apply(oem(ple4,mass=FALSE),2:6,sum)),.3))
+
+u =FLQuants("Unbiased"       =rlnorm(100,log(stock(om)),.3),
+            "AR"             =rlnoise(100,log(stock(om)),.3,b=.7),
+            "Hyperstability" =rlnorm(100,log(hyperstability(stock(om),0.5)),.3),
+            "Trend"          =rlnorm(100,log(trend(stock(om),0.01)),.3),
+            "Hetroscedascity"=rlnorm(100,log(stock(om)),.3)*trend(stock(om)%=%1,0.01),
+            "Juvenile"       =rlnorm(100,log(stock(om)-ssb(om)),.3),
+            "Mature"         =rlnorm(100,log(ssb(om)),.3),
+            "Numbers"        =rlnorm(100,log(apply(stock.n(om),2:6,sum)),.3))
 
 u=FLQuants(llply(u,function(x) x/mean(x)))
 u=ldply(u,as.data.frame)
 
-u.=ddply(u,.(year,.id), with, quantile(data))
+u.=ddply(u,.(year,.id), with, quantile(data,na.rm=T))
 ggplot()+
   geom_line(aes(year,data,col=factor(iter)),
             data=subset(u,iter%in%c(2,11)))+
@@ -295,111 +288,31 @@ ggplot()+
   theme_bw()+theme(legend.position="none")
 ```
 
-```{r oemlen,echo=TRUE,eval=TRUE}
-library(FLCore)
-library(ggplotFL)
-library(tmvtnorm)
-library(plyr)
-library(reshape) 
+
+**Figure `r iFig=iFig+1; iFig`** Example of OEM for indices of abundance. 
+
+### Mean length
+
+Create an index of mean length
+```{r}
+mnLn=apply(wt2len(stock.wt(om),lh)%*%stock.n(om),c(2,6),sum)%/%apply(stock.n(om),c(2.,6),sum)
 ```
 
-```{r oemlen2,echo=TRUE,eval=TRUE}
-data(ple4)
-
-n =survey(ple4)
-n =round(1000*n%/%apply(n,2:6,sum))
-l =stock.wt(ple4)^0.3
-
-sigma=FLPar(0,dimnames=dimnames(n)[c(1,1:6)])
-sigma=apply(sigma,3:7,function(x) {diag(x)=0.2;x})
-sigma=FLPar(c(sigma),dimnames=dimnames(n)[c(1,1:6)])
-
-sigma=FLPar(aperm(maply(dimnames(l)$year, function(year)           cor2cov(sigma@.Data[,,year,,,,,drop=T],l[,year])),3:1))
-names(dimnames(sigma)[3])="year"
-
-upper=n%=%20
-
-x=rtmvnorm(n=max(n[,1]), mean=c(l[,1]), sigma=matrix(c(sigma[,,1,drop=T]),10,10), upper=c(upper[,1]))
-x=melt(x)
-
-names(x)[1:2]=c("iter","age")
-n=as.data.frame(n,drop=TRUE)
-x =subset(merge(n,x),iter<=data)
-
-ggplot(x)+
-  geom_histogram(aes(value,fill=factor(age)))+
-  xlab("Year")+ylab("Count")
+and compare with F
+```{r}
+plot(FLQuants(mnLn,fbar(om)))
 ```
 
-
-```{r oemlen3,echo=TRUE,eval=TRUE}
-library(FLCore)
-library(tmvtnorm)
-library(reshape2)
-
-lem2<-function(n,l,sd){
-
-  se=sd/n^0.5
-  se=(apply(se%*%se%*%n,c(2:6),sum)%/%apply(n,2:6,sum))^0.5
-  
-  ln=apply(l%*%n,2:6,sum)%/%apply(n,2:6,sum)
-    
-  FLQuants(len=ln,se=se)}
-
-data(ple4)
-
-n =survey(ple4)
-n =round(1000*n%/%apply(n,2:6,sum))
-l =stock.wt(ple4)^0.3
-sd=l*0.2
-
-lengths=lem2(n,l,sd)
-
-ggplot()+
-  geom_line(aes(year,data),data=as.data.frame(lengths[[1]]))+
-  geom_errorbar(aes(year,ymin=min,ymax=max),
-                data=model.frame(FLQuants(
-                         min=lengths[[1]]-lengths[[2]],
-                         max=lengths[[1]]+lengths[[2]])))+
-  xlab("Year")+ylab("Mean Length")
-```
+**Figure `r iFig=iFig+1; iFig`** Comparison of mean length and fishing mortality. 
 
 
+First create an Age Length Key that will be used to slice up numbers-at-age
 ```{r, turbot-alk,echo=TRUE,eval=TRUE}
-#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R')
-
-library(reshape)
-lh=lhPar(FLPar(linf=89))
-
 ak=alk(lh)  
 ```
 
-```{r, turbot-lfd,echo=TRUE,eval=TRUE}
-#source('~/Desktop/sea++/mydas/pkg/R/genTime.R')
-
-library(FLBRP)
-library(FLasher)
-
-lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
-
-lh=lhPar(lh)  
-
-eq=lhEql(lh)
-
-gTime=c(round(gt(eq)))
-
-fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                                 seq(.1,2,length.out=30),
-                                                 seq(2,1.0,length.out=gTime)[-1],
-                                                 rep(1.0,61)))[,1:105]
-om=as(eq,"FLStock")
-
-om=fwd(om,f=fbar(om)[,-1], sr=eq)
-```
-
+Then use the ALK to sample lengths
 ```{r, lfd}
-#source('~/Desktop/sea++/mydas/pkg/R/oemLn.R') 
-
 lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
 ```
 
@@ -411,7 +324,7 @@ ggplot(melt(lfd[,seq(1,45,10)]))+
   coord_cartesian(xlim=c(0,mean(lh["linf"])))
 ```
 
-**Figure `r iFig=1; iFig`** Observation error model for turbot. 
+**Figure `r iFig=1; iFig`** Observation error model for turbot length samples. 
 
 [Back to Top](#top)
 

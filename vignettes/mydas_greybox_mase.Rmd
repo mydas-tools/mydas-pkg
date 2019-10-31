@@ -1,0 +1,215 @@
+---
+title: "Simulation Testing Data Limited Methods **mydas**"
+subtitle: "Greybox Model"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+github_document:
+  mathjax: TRUE
+pdf_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+---
+ 
+```{r, ini, echo=FALSE, results='hide', message=FALSE, warnings=FALSE, cache=FALSE,eval=!TRUE}
+library(knitr)
+source("R/ini.R")
+```
+
+```{r knitr_init, echo=FALSE, results="hide", eval=!FALSE}
+library(knitr)  
+## Global options
+opts_chunk$set(cache     =TRUE,
+               echo      =FALSE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =TRUE,
+               fig.height=4,
+               fig.width =6,
+               fig.path  ="tex/simtest/grey-",
+               cache.path="cache/simtest/grey/")
+```
+
+```{r}
+options(digits=3)
+
+iFig=0
+```
+
+
+# Introduction
+
+This tutorial describes how to simuation test data limited methods in `FLR` using a variety of other packages.
+
+## Required packages
+
+To follow this tutorial you should have installed the following packages:
+
+- FLR: [FLCore](http://www.flr-project.org/FLCore/), [FLBRP](http://www.flr-project.org/FLBRP/), [FLasher](http://www.flr-project.org/FLash/), [FLife](http://www.flr-project.org/FLife/)
+
+for example
+
+```{r, pkgs}
+# Load  packages
+library(ggplot2)
+library(plyr)
+library(reshape)
+
+library(popbio)
+
+library(FLCore)
+library(ggplotFL)
+library(FLBRP)
+library(FLasher)
+library(FLife)
+library(mydas)
+library(greybox)
+```
+
+# Operating Model
+
+Turbot
+
+```{r, om}
+lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
+lh=lhPar(lh)
+eq=lhEql(lh)
+
+gTime=c(round(gt(eq)))
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out=30)[-30],
+                                              seq(2,1.0,length.out=gTime)[-1],
+                                              rep(1.0,61)))[,1:105]
+
+om=as(eq,"FLStock")
+om=fwd(om,f=fbar(om)[,-1], sr=eq)
+```
+
+```{r, ts}
+plot(FLQuants(om, 
+          "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
+          "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
+          "catch"=function(x) landings(x)%/%refpts(eq)["msy","yield"],
+          "rec" = function(x) rec(x)%/%refpts( eq)["msy","rec"])) + 
+  geom_hline(aes(yintercept=1),col="red",linetype=2)+
+  theme_bw() 
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series relative to MSY benchmarks.
+
+# Greybox
+
+There are three well-known notions of "boxes" in modelling:
+1. White box - the model that is completely transparent and does not have any randomness. One can see how the inputs are transformed into the specific outputs.
+2. Black box - the model which does not have an apparent structure. One can only observe inputs and outputs but does not know what happens inside.
+3. Grey box - the model that is in between the first two. We observe inputs and outputs plus have some information about the structure of the model, but there is still a part of unknown. 
+
+The white boxes are usually used in optimisations (e.g. linear programming), while black boxes are popular in machine learning. As for the grey box models, they are more often used in analysis and forecasting. So the package `greybox` contains models that are used for these purposes.
+
+At the moment the package contains advanced linear model function and several basic functions that implement model selection and combinations using information criteria (IC). You won't find statistical tests in this package - there's plenty of them in the other packages. Here we try using the modern techniques and methods that do not rely on hypothesis testing. This is the main philosophical point of `greybox`.
+
+
+```{r}
+library(greybox)
+
+ssb=ts(c(ssb(om)))
+
+xreg   =as.data.frame(xregExpander(ssb,lags=c(-10:0)))
+xreg <- cbind(as.matrix(ssb),xreg)
+colnames(xreg)[1] <- "y"
+ourModel <- stepwise(xreg)
+ourModel
+ourModel <- lmCombine(xreg[,c("y","x",names(ourModel$coefficients)[-(1:2)])],
+                      bruteforce=TRUE)
+summary(ourModel)
+cols=c("y","x",names(ourModel$coefficients)[-(1:2)])
+Insample <- xreg[1:100,];
+Holdout <- xreg[-(1:100),cols];
+ourModel <- lmCombine(Insample,bruteforce=FALSE)
+summary(ourModel)
+plot(ourModel)
+ourForecast <- predict(ourModel,Holdout)
+plot(ourForecast)
+ourModel <- lmDynamic(Insample,bruteforce=FALSE)
+ourSummary <- summary(ourModel)
+ourSummary
+plot(ourModel)
+# Coefficients in dynamics
+head(ourModel$coefficientsDynamic)
+# Standard errors of the coefficients in dynamics
+head(ourModel$se)
+# Importance of parameters in dynamics
+head(ourModel$importance)
+plot(coef(ourModel))
+ourModel$dfDynamic
+ourModel$df.residualDynamic
+ourForecast <- predict(ourModel,BJHoldout)
+plot(ourForecast)
+```
+
+```{r}
+library(greybox)
+BJxreg <- as.data.frame(xregExpander(BJsales.lead,lags=c(-10:10)))
+BJxreg <- cbind(as.matrix(BJsales),BJxreg)
+colnames(BJxreg)[1] <- "y"
+ourModel <- stepwise(BJxreg)
+ourModel <- stepwise(BJxreg)
+ourModel
+ourModel <- lmCombine(BJxreg[,-c(3:7,18:22)],bruteforce=TRUE)
+summary(ourModel)
+BJInsample <- BJxreg[1:130,];
+BJHoldout <- BJxreg[-(1:130),];
+ourModel <- lmCombine(BJInsample,bruteforce=FALSE)
+summary(ourModel)
+plot(ourModel)
+ourForecast <- predict(ourModel,BJHoldout)
+plot(ourForecast)
+ourModel <- lmDynamic(BJInsample,bruteforce=FALSE)
+ourSummary <- summary(ourModel)
+ourSummary
+plot(ourModel)
+# Coefficients in dynamics
+head(ourModel$coefficientsDynamic)
+# Standard errors of the coefficients in dynamics
+head(ourModel$se)
+# Importance of parameters in dynamics
+head(ourModel$importance)
+plot(coef(ourModel))
+ourModel$dfDynamic
+ourModel$df.residualDynamic
+ourForecast <- predict(ourModel,BJHoldout)
+plot(ourForecast)
+```
+
+
+# References
+
+# More information
+
+* You can submit bug reports, questions or suggestions on this tutorial at <https://github.com/flr/doc/issues>.
+* Or send a pull request to <https://github.com/flr/doc/>
+* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage, <http://flr-project.org>.
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLasher: `r packageVersion('FLasher')`
+* **Compiled**: `r date()`
+
+## License
+
+This document is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0) license.
+
+## Author information
+
+**Laurence KELL**. laurie@seaplusplus.co.uk
+
+
+## Acknowledgements
+
+This vignette and the methods documented in it were developed under the MyDas project funded by the Irish exchequer and EMFF 2014-2020. The overall aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY) reference points (or proxy MSY reference points) across the spectrum of data-limited stocks.

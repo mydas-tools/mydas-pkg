@@ -1,0 +1,310 @@
+---
+title: "Selection of Stock Assessment Methods and Proxy Reference Points for use in Management Procedures"
+subtitle: "Time Series Dynamics"
+author: "L Kell"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    includes:
+      in_header: header.tex 
+---
+
+To provide advice on the status of data poor stocks ICES uses $MSY$ proxy reference points as part of a Precautionary Approach. For data poor stocks without analyical assessments where only time series such as lpue,  cpue,  and  mean  length  in  the  catch   are available (**Category 3** stocks), empirical rules may be used.
+
+This requires focusing on the nature of time-series and developing diagnostics that can help determine the rules that would work well under alternative characterisations of the nature of the time-series, and aspects such as quality of data used by the rules (and hence ability to detect signals), ability to set appropriate reference points, etc.;
+
+Therefore to evaluate what assumptions are the most important in determining the robustness of potential indicators (the power to detect overfishing) and the benefits of reducing uncertainty an Operating Model (OM) was conditioned on a range of assumptions about stock dynamics. The OM was projected for different levels of constant F relative to $F_{MSY}$ and summarise scenarios by clustering on the frequency spectrum of the  time series.
+
+```{r, knitr, eval=TRUE, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(knitr)
+
+opts_chunk$set(comment   =NA, 
+               warning   =FALSE, 
+               message   =FALSE, 
+               error     =FALSE, 
+               echo      =FALSE,
+               fig.width =10, 
+               fig.height=10,
+               cache     =TRUE, 
+               fig.path  ="tex/timeseries-",
+               cache.path="cache/timeseries/")
+
+iFig=0
+iTab=0
+```
+```{r, pkgs} 
+library(FLCore)
+library(ggplotFL)
+library(FLBRP)
+library(FLasher)
+library(FLife)
+library(mydas)
+library(popbio)
+
+library(scales)
+library(plyr)
+library(dplyr)
+library(reshape)
+library(grid)
+library(reshape)
+library(popbio)
+library(magrittr)
+library(broom)
+library(GGally)
+```
+
+```{r, indicators, eval=FALSE}
+indicatorsOld<-function(params,
+                     m   ="gislason",
+                     f    =1,
+                     srDev=FLQuant(rep(1,1021)),
+                     fbar  =srDev%=%1){
+
+  ##set up equilibrium object
+  if ("numeric"%in%is(f))
+    f=FLPar(f=array(f,c(1,length(f))))
+    
+  ## need to add interactions for f and par
+  if (dim(params)[2]>1&dim(f)[2]>1){
+    npar=dim(params)[2]
+    params=as(mdply(seq(dim(f)[2]), with, 
+                    cbind(model.frame(params)))[,-c(1,dim(params)[1]+2)],"FLPar")
+    f  =rep(c(f),each=npar)
+    f  =FLPar(array(f,c(1,length(f))))
+    }
+  
+  eql=lhEql(params,m=m)
+  
+  ## convert to FLStock with constant F
+  eq=eql
+
+  fbar(eq)=fbar
+  mlt=FLPar(f=array(c(f)*c(eq@refpts["msy","harvest"]),
+                    c(1,length(c(f)*c(eq@refpts["msy","harvest"])))))
+  fbar(eq)=fbar(eq)%*%mlt
+  
+  stk=fwd(as(eq,"FLStock"),fbar=fbar(eq)[,-1],
+          sr=eq,residuals=srDev)
+  
+  ## Other stuff
+  #srr=model.frame(FLQuants(eql,"ssb"=ssb,"rec"=rec),drop=TRUE)
+  #srp=model.frame(FLQuants("rp"=setPlusGroup(stock.n(eq)[,1]*stock.wt(eq)[,1]*eq@mat[,1],12)),drop=T)
+  #ts =model.frame(FLQuants(stk,"ssb"=ssb,"biomass"=stock,"rec"=rec,"catch"=catch,
+  #                             "dev"=function(x) propagate(srDev,dim(x)[6])),drop=T)
+  
+  ## Summary stats
+  ind=omSmry(stk,eql,params)
+ 
+  refs=model.frame(priors(params,eq=lhEql(params,m=m)))
+  
+  key=cbind(model.frame(params),f=c(f))
+  
+  list(ind=ind,refs=refs,key=key,
+       ctn=catch.n(stk),
+       cln=exp(log(catch.wt(stk)%/%params["a"])%/%params["b"]))
+       }
+```
+
+```{r, lh}
+## Run and combine indicators
+source('~/Desktop/sea++/mydas/pkg/R/priors.R')
+source('~/Desktop/sea++/mydas/pkg/R/omOut.R') 
+
+data(teleost)
+lh=lhPar(teleost[,"Psetta maxima"])
+lh=propagate(lh,16)
+
+dat=as(expand.grid(sel3=c(5000,5),
+                   s   =c(0.75,0.9),
+                   k   =c(1,0.5)*0.28,
+                   bg  =c(3,3.1)),"FLPar")
+lh[c("sel3","s","k","bg")]=dat[c("sel3","s","k","bg")]
+```
+
+
+```{r}
+## adjust for bg>3 #########################################
+# calculate virgin SSB for bg=3 and 3.1 then adjust MSY 
+flag=c(par["bg"])==3
+bg  =lhEql(par)
+refpts(bg)=refpts(bg)["virgin"]
+rfs=refpts(bg)
+stock.wt(bg)[,,,,,!flag]=stock.wt(bg)[,,,,,flag]
+adj=data.frame(M   ="Gislason",
+               iter=model.frame(par)[,"iter"],
+               adj =1000/c(computeRefpts(bg)[,"ssb",]))
+
+bg  =lhEql(par,m=function(...) 0.2)
+refpts(bg)=refpts(bg)["virgin"]
+rfs=refpts(bg)
+stock.wt(bg)[,,,,,!flag]=stock.wt(bg)[,,,,,flag]
+adj=rbind(adj,
+          data.frame(M   ="0.2",
+               iter=model.frame(par)[,"iter"],
+               adj =1000/c(computeRefpts(bg)[,"ssb",])))
+refs=transform(merge(refs,adj,by=c("iter","M"),all.x=T),msy=msy*adj)
+```
+
+```{r, eq}
+eq       =as(list("Gislason"=lhEql(lh)),"FLBRPs")
+eq["0.2"]=lhEql(lh,m=function(...) 0.2)
+```
+
+```{r, pd}
+pd1=popdyn(lh,eq[["Gislason"]])
+pd2=popdyn(lh,eq[["0.2"]])
+```
+
+```{r}
+set.seed(234)
+srDevs        =FLQuants("0.3"
+              =rlnoise(1,FLQuant(0,dimnames=list(year=1:121)),0.3,0))
+set.seed(234)
+srDevs[["0.5"]]=rlnoise(1,FLQuant(0,dimnames=list(year=1:121)),0.5,0)
+set.seed(234)
+srDevs[["AR"]] =rlnoise(1,FLQuant(0,dimnames=list(year=1:121)),0.3,0.75)
+```
+
+```{r}
+fbar=fbar(eq[["0.2"]])%=%3
+
+fbar=fbar%*%refpts(eq[["Gislason"]])["msy","harvest"]
+fbar(eq[["Gislason"]])=fbar
+stk1=as(eq[["Gislason"]],"FLStock")
+stk1=fwd(stk1,fbar=fbar[,-1],
+         sr=eq[["Gislason"]],residuals=srDevs[["0.3"]])
+
+fbar=fbar%*%refpts(eq[["0.2"]])["msy","harvest"]
+fbar(eq[["0.2"]])=fbar
+stk1=as(eq[["0.2"]],"FLStock")
+stk1=fwd(stk1,fbar=fbar[,-1],
+         sr=eq[["0.2"]],residuals=srDevs[["0.3"]])
+```
+
+
+```{r}
+ts=omSmry(stk1)
+
+cc=ddply(ts,.(iter), with, { 
+      res=ccf(rec,ssb,lag=10,plot=FALSE)
+      data.frame(lag=-10:10,ACF=res$acf)})
+
+```
+
+# Figures
+
+```{r, ts}
+load("/home/laurence/Desktop/sea++/mydas/project/papers/mase/data/refcase.RData")
+
+dat=subset(refcase$ts[,c("year","iter","f","rec","catch","ssb")],f>0.5&iter%in%1:200)
+flq=FLQuants(F          =as.FLQuant(transform(dat[,c(1:2,3)],data=f)[,-3],units="NA")[,,,,,1],
+             Recruitment=as.FLQuant(transform(dat[,c(1:2,4)],data=rec)[,-3],units="NA"),
+             SSB        =as.FLQuant(transform(dat[,c(1:2,6)],data=ssb)[,-3],units="NA"),
+             Catch      =as.FLQuant(transform(dat[,c(1:2,5)],data=catch)[,-3],units="NA"))
+plot(flq)+theme_bw()+theme(legend.position="none")+xlab("Year")
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Time series
+
+
+```{r, spec-dense}
+key=0
+idx=ddply(refcase$ts, .(f,k,M,s,bg,sel3,CV,AR), with, {
+            key<<-key+1
+            data.frame(ssb=scale(ssb),year=year,key=key)})
+sar=ddply(idx, .(f,k,M,s,bg,sel3,CV,AR), with,
+      as.data.frame(spec.ar(ssb,plot=FALSE,demean=TRUE)[c("freq","spec")]))
+
+ggplot(subset(sar,1/freq<=100&bg==3&AR==0))+
+  geom_line(aes(1/freq,spec,
+                col     =as.character(CV),
+                group   =paste(AR,CV,sel3),
+                linetype=as.character(sel3)))+
+  xlab("Wave Length")+ylab("")+
+  facet_grid(f*M~k*s)+
+  theme_bw()+
+  theme(legend.position="bottom")
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Estimate spectral densities of SSB from AR fits.
+
+```{r, scree, fig.width=6, fig.height=4}
+sfn=ddply(idx,        .(f,k,M,s,bg,sel3,CV,AR), with,
+          as.data.frame(spec.pgram(ssb,plot=FALSE,demean=TRUE)[c("freq","spec")]))
+
+mat=cast(sfn,f+k+M+s+bg+sel3+CV+AR~freq,value="spec")
+
+kclusts=data.frame(nclst=1:25) %>% 
+  group_by(nclst) %>% 
+  do(kclust=kmeans(mat, .$nclst, nstart=20,  iter.max=20))
+
+## scree plot
+scree=kclusts %>% group_by(nclst) %>% do(glance( .$kclust[[1]])) 
+ggplot(scree, aes(nclst, tot.withinss)) + 
+  geom_line()+
+  xlab("Number of Clusters")+ylab("Within SS")+
+  theme_bw()
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Scree plot to identify number of clusters, i.e. 10
+
+
+\newpage
+\blandscape
+```{r, clusters, fig.width=12,fig.height=6}
+assign=kclusts %>% group_by(nclst) %>% do(tidy(.$kclust[[1]])) 
+
+## time series
+key=kclusts %>% group_by(nclst) %>% do(augment(.$kclust[[1]], cbind(mat[,seq(8)],key=seq(288))))
+key=transform(key,cluster=factor(.cluster,levels=1:25))[,-11]
+idx.=merge(idx,key[,c("key","nclst","cluster")],by="key",all=TRUE)
+mn  =ddply(subset(idx.,year%in%501:600&nclst%in%seq(1,5)),
+                  .(cluster,nclst,year), with, data.frame(mean=mean(ssb)))
+ggplot(subset(idx.,nclst%in%seq(1,5)&year%in%501:600))+
+  geom_line(aes(year,ssb,group=key),col="grey50",size=.1)+
+  geom_line(aes(year,mean),col="blue",data=mn)+
+  facet_grid(nclst~cluster)+
+  xlab("Cluster")+ylab("SSB")+
+  scale_x_continuous(breaks=seq(500,600,50))+
+  theme_bw()+
+  theme(axis.text.x=element_text(angle=45),legend.position="bottom")
+```
+
+**Figure `r iFig=iFig+1; iFig`.** Clusters
+\elandscape
+
+```{r}
+save(key,file="/home/laurence/tmp/key.RData")
+```
+
+```{r, acf}
+load("/home/laurence/Desktop/sea++/mydas/project/papers/mase/data/refcase.RData")
+load("/home/laurence/tmp/key.RData")
+
+ccf=ddply(refcase$ts,.(f,k,M,s,bg,sel3,CV,AR),with,{
+  res=ccf(rec,ssb,plot=F,lag=20)
+  data.frame(lag=-20:20,ACF=res$acf)})
+
+ccf=merge(ccf,subset(key,nclst==5),
+           by=c("f","k","M","s","bg","sel3","CV","AR"))
+
+ggplot(ccf)+
+  geom_boxplot(aes(factor(lag,levels=-20:20),ACF),outlier.shape=NA)+
+  facet_wrap(~cluster)+
+  xlab("Lag")
+```
+**Figure `r iFig=iFig+1; iFig`.** Cross correlations between recruitment and SSB.
+
+
+# References {#References}
+
+\newpage
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+

@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Hi Laurie, below are some of my comments on the vignettes. Many of them deal with missing or incomplete help files and most of these functions are in packages other than mydas but improving the documentation should be beneficial for the whole FLR framework.
+
+Mydas_conditioning vignette
+* FLCore::FLPar() - helpfile: the function does not seem to have any validation on the names of the parameters. Perhaps this is by design so you can include anything you want, however users do need a list of parameters that are 'understood' by functions later on in the code. Not sure how this would work if FLPar is a generic function. For MYDAS would probably be best to list the parameters relevant to MYDAS in one of the Vignettes
+* FLife::lhPar() - helpfile: all the parameters need to be listed and it would be nice if the default values or equations and references for filling in missing values would be given here as well (in the conditioning vignette this was nicely documented but it would be good to see this in the helpfile as well)
+* FLife:: lhEql() - help file missing
+# Time Series Dynamics. It would be nice to be a bit more explicit about what is going on here. You are simulating a time series of F and apply that to the operating model, without feedback (F has already been decided) and without recruitment deviations etc.
+## Stochasticity. Now we are including recruitment variability but again there is a missing helpfile for FLCore::rlnoise()
+Also, the term 'residuals' seems to be depreciated in fwd(); now called deviances
+* Exploring sensitivity of equilibrium reference points - I think it would be nice to include the code in example-1.R in the conditioning vignette; just to show how you can vary the lh parameters.
+* It might be nice to include the turbot om as a dataset in the package, then the other vignettes can skip all the parts about condidtioning the OM
+
+Mydas_oem vignette
+## Catch per unit effort - you start by generating an unbiased index of total biomass using the function stock(). It is kind of difficult to figure out what this function does. I think it is total stock biomass. Might be handy to mention this.
+### Effort creep - if I understand it correctly the trend() function you define here increases catchability by 2% per year in this example. "Model an increase in catchabilty, e.g. due to an increase in catchability. In this example the catchability increases by 2% per year"
+%=% I am always a bit confused by these special operators and find it difficult to get help. Could you explain what it does (I think it makes the value of stock(om) be 1). Neat. Anway, it is difficult to find a balance between how much to explain about R coding and how much you can assume. Just highlighting where my comfort zone ends....
+
+Mydas_sra vignette
+* Mydas::popdyn() function - needs documentation. Can (presumably) refer to lhPar but also need to explain what all the reference points are and how they are calculated. Variable names like lc are particulary tricky as they can mean different things, depending on which length-based method you use (it can be length at 50% of modal abundance or length at full selection).
+* A bit more explanation please of the steps: first you fit an assessment model to the OM with perfect knowledge. This is an important step to validate that the model makes sense
+* setMP() - explain what is going on here: a bit of documentation on what a biodynamic model does or a reference to a separate vignette
+* explain why you fit the model to the years 20:54 only
+* second model, explain that by using only the first two and last two values of the index, you essentially (or exactly?) have a dbsra model
+* also explain why it gives the same result as the MP run
+* explain that sra-2 is where you give an incorrect estimate of the final biomass (b0)
+
+mydas_length vignette
+* mydas::omSmry() - output needs to be documented in help file, what do all the statistics mean and how are they calculated?
+* In the vignette mnLen is the mean length in the catch, I understand that the mean length Z methods takes the mean length of individuals larger than Lc as an input (where Lc is the length at full selection). This is not the exactly the same as the mean length in the catch, unless you have knife-edge selectivity.
+* mydas:::mlz() not documented, e.g. how do you decide on the number of break points?
+* The output (res) is typical mlz output but difficult to interpret. Is it easy to plot the estimated mean length time series from MLZ against the OM? Also it should be possible to plot the F (or Z) in each time block and compare to OM?
+* mydas::lenSample - helpfile incomplete
+* lbspr method - I presume this will become part of the package?
+* Similar to mlz, is it possible to plot the outpute of lbspr against the om, e.g. F/M?
+
+Mydas_msy vignette
+* Could you add a bit explaining the first step is just adding noise to the OM and no model, no feedback at this stage. Explain why you are doing this.
+### Harvest Control Rule - Maybe explain that this is an example of a tuna? hcr. 
+* FLCore:fmle - no help file
+* I'm getting an error now in mseXSA that I didn't get last week:
+Error in mseXSA(oms[["Projection"]], eq, mp, xsaControl, rf = rf, sr_deviances = srDev,  : 
+  unused arguments (sr_deviances = srDev, u_deviances = uDev)
+* And another error in mseMPB2:
+Error in read.table(paste("pella.rep", sep = ""), skip = 18, header = T) : no lines available in input
+

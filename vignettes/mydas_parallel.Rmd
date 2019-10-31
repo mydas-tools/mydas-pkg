@@ -1,6 +1,6 @@
 ---
-title: "**FLife**"
-subtitle: "Parallel Running"
+title: "MyDas"
+subtitle: "An example of running in parallel"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -12,7 +12,7 @@ tags: [FLR]
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
 ---
 
-http://rpubs.com/pl202/436164
+An example of running an MSE in parallel, downloading data from dropbox and google drive, and uploading results to Amazon Web Server.
 
 ```{r knitr_init, echo=FALSE, results="hide"}
 library(knitr)
@@ -20,7 +20,7 @@ library(knitr)
 opts_chunk$set(cache     =TRUE,
                cache.path='cache/parallel/',
                echo      =TRUE,
-               eval      =TRUE,
+               eval      =!TRUE,
                prompt    =FALSE,
                comment   =NA,
                message   =FALSE,
@@ -35,12 +35,18 @@ iFig=0
 ```
 
 
+## Load Libraries
+
 ```{r, pkgs, message=FALSE}
-library(ggplotFL)
 library(plyr)
 library(reshape)
+
+library(FLCore)
 library(FLBRP)
+library(FLasher)
+library(ggplotFL)
 library(FLife)
+library(mydas)
 ```
 
 ```{r, theme, echo=FALSE}
@@ -48,63 +54,21 @@ theme_set(theme_bw())
 options(digits=3)
 ```
 
-## Install FLR packages
 
-To follow this tutorial you will have to install a number of packages, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
-
-Install FLR from [https://www.flr-project.org/](www.flr-project.org/)
 ```{r, eval=FALSE}
-install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
-             repos="http://flr-project.org/R")
-```
-
-`devtools` needs to be installed and then loaded so that the `mydas` package can be installed from this GitHub repository.
-
-```{r}
-install.packages("devtools",dependencies=TRUE)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-library(devtools)
-
-devtools::install_github("lauriekell/mydas-pkg")
-```
-
-## Load Libraries
-```{r}
-library(plyr)
-library(reshape)
-library(ggplot2)
-```
-
-```{r}
-library(FLCore)
-library(FLasher)
-library(FLBRP)
-library(FLife)
-library(mydas)
-```
-
-
-```{r}
-```
-
-
-
-```{r}
-library(FLCore)
-library(FLasher)
-library(FLBRP)
-library(mydas)
-
 library(doParallel)
 library(foreach)
 
-library(googledrive)
+registerDoParallel(4)
+```
 
-fls=drive_find()
-drive_download("ray.RData",path="ray.RData")
-load("ray.RData")
+```{r, eval=FALSE}
+#library(googledrive)
+#fls=drive_find()
+#drive_download("turbot.RData",path="turbot.RData")
+#load("turbot.RData")
+
+load("/home/laurence/Desktop/sea++/mydas/project/data/OM/turbot.RData")
 
 ### Stochasticity
 nits=dim(om)[6]
@@ -126,12 +90,129 @@ empD<-foreach(i=(seq(dim(scen)[1])),
               .packages=c("FLCore","FLasher","FLBRP","FLife","plyr","reshape")) %dopar%{
                 
                omRes=mseSBTD(om,eq,control=with(scen[i,],c(k1=k1,k2=k2,gamma=gamma)),start=60,end=100,
-                             srDev=sr_deviances,uDev=u_deviances)
+                             sr_deviances=srDev,u_deviances=uDev)
 
                res  =cbind(scen=i,k1=scen[i,"k1"],k2=scen[i,"k2"],gamma=scen[i,"gamma"],
                             omSmry(omRes,eq,lh))
                 
                res}
+```
+
+```{r, eval=FALSE}
+#library(googledrive)
+#fls=drive_find()
+#drive_download("turbot.RData",path="turbot.RData")
+#load("turbot.RData")
+```
+
+```{r, eval=FALSE}
+#library(googledrive)
+#fls=drive_find()
+#drive_download("turbot.RData",path="turbot.RData")
+#load("turbot.RData")
+```
+
+```{r, eval=FALSE}
+### Stochasticity
+nits=dim(om)[6]
+set.seed(1234)
+srDev=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
+
+### OEM
+uDev =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+
+## MSE for Derivate empirical MP
+scen=expand.grid(k1=seq(0.2,1.0,0.8),k2=seq(0.2,1.0,0.8),gamma=seq(1,2),
+                 stringsAsFactors=FALSE)
+```
+
+```{r, eval=FALSE}
+### Stochasticity
+nits=dim(om)[6]
+set.seed(1234)
+srDev=FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.2,b=0.0)
+
+### OEM
+uDev =FLife:::rlnoise(nits,FLQuant(0,dimnames=list(year=1:100)),0.3,b=0.0)
+
+## MSE for Derivate empirical MP
+scen=expand.grid(k1=seq(0.2,1.0,0.8),k2=seq(0.2,1.0,0.8),gamma=seq(1,2),
+                 stringsAsFactors=FALSE)
+```
+
+```{r, eval=FALSE}
+## MSE for Derivate empirical MP
+scen=expand.grid(k1=seq(0.2,1.0,0.8),k2=seq(0.2,1.0,0.8),gamma=seq(1,2),
+                 stringsAsFactors=FALSE)
+
+empD<-foreach(i=(seq(dim(scen)[1])), 
+              .combine=rbind,
+              .multicombine=TRUE,
+              .packages=c("FLCore","FLasher","FLBRP","FLife","plyr","reshape")) %dopar%{
+                
+               omRes=mseSBTD(om,eq,control=with(scen[i,],c(k1=k1,k2=k2,gamma=gamma)),start=60,end=100,
+                             sr_deviances=srDev,u_deviances=uDev)
+
+               res  =cbind(scen=i,k1=scen[i,"k1"],k2=scen[i,"k2"],gamma=scen[i,"gamma"],
+                            omSmry(omRes,eq,lh))
+                
+               res}
+```
+
+```{r, eval=FALSE}
+empD<-foreach(i=(seq(dim(scen)[1])), 
+              .combine=rbind,
+              .multicombine=TRUE,
+              .packages=c("FLCore","FLasher","FLBRP","FLife","plyr","reshape")) %dopar%{
+                
+               omRes=mseSBTD(om,eq,control=with(scen[i,],c(k1=k1,k2=k2,gamma=gamma)),start=60,end=100,
+                             sr_deviances=srDev,u_deviances=uDev)
+
+               res  =cbind(scen=i,k1=scen[i,"k1"],k2=scen[i,"k2"],gamma=scen[i,"gamma"],
+                            omSmry(omRes,eq,lh))
+                
+               res}
+```
+
+```{r, eval=FALSE}
+library(RPostgreSQL)
+library(dplyr)
+library(plyr)
+library(reshape)
+
+drv  = dbDriver("PostgreSQL")
+con1 = dbConnect(drv, host = 'postgresql-seascope.csffkpr9jjjn.eu-west-2.rds.amazonaws.com',
+                 dbname='FLRout',
+                 port = 5432,
+                 user = 'MydasAdmin',
+                 password = 'datapoor1!')
+##write
+res$om="Turbot"
+dbWriteTable(con1, "data_om", value = res, append=FALSE,overwrite=FALSE,row.names=FALSE)
+
+##read
+omtest = dbGetQuery(con1, paste0("SELECT *from data_om"))
+
+scenarios=expand.grid(stock=c("brill","turbot","ray","pollack","sprat","lobster","razor"),
+                      mp   =c("xsa","mpb","sra","lbspr","2/3","pid","sbt1","sbt2","irate"))
+xsaOptions=expand.grid(mp="xsa",ftar=c(0.7,1,1,2),interval=1:3)
+scenarios=merge(scenarios,xsaOptions,all=TRUE)
+```
+
+
+```{r, eval=FALSE}
+res$om="Turbot"
+dbWriteTable(con1, "data_om", value = res, append=FALSE,overwrite=FALSE,row.names=FALSE)
+```
+
+
+```{r, eval=FALSE}
+omtest = dbGetQuery(con1, paste0("SELECT *from data_om"))
+
+scenarios=expand.grid(stock=c("brill","turbot","ray","pollack","sprat","lobster","razor"),
+                      mp   =c("xsa","mpb","sra","lbspr","2/3","pid","sbt1","sbt2","irate"))
+xsaOptions=expand.grid(mp="xsa",ftar=c(0.7,1,1,2),interval=1:3)
+scenarios=merge(scenarios,xsaOptions,all=TRUE)
 ```
 
 ## Software Versions

@@ -1,6 +1,6 @@
 ---
-title: "**mydas**"
-subtitle: "Conditioning Operating Models on Data"
+title: "**MyDas**"
+subtitle: "Conditioning Operating Models"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -9,11 +9,35 @@ pdf_document:
   fig_width: 6 
   fig_height: 4 
 tags: [FLR]
+bibliography: refs.bib
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
 ---
 
-http://rpubs.com/pl202/436164
+[](#top)
 
+[Introduction](#Introduction)
+
+[Installation](#Installation)
+
+[Example](#Example)
+
+[Life history relationships](#Life history relationships)
+
+[Equilibrium Dynamics](#Equilibrium Dynamics)
+
+[Time Series Dynamics](#Time Series Dynamics)
+
+[References](#References)
+
+
+# Introduction
+
+The aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY), or proxy MSY reference points across the spectrum of data-limited stocks. 
+
+This requires developing Operating Models (OMs) that can be used to simulate a range of stock dynamics under different hypotheses. The OMs are then used to generate pseudo data using an Observation Errort Model (OEM) to test the robustness of alternative assessement methods and reference points.  
+
+There are two main packages `mydas` which has various methods for conditioning OMs, generating pseudo data and simulation testing data-limited stock assessment methods and `FLife` which models life history relationships. Both packages use `FLR`.
+ 
 ```{r knitr_init, echo=FALSE, results="hide"}
 library(knitr)
 ## Global options
@@ -34,47 +58,40 @@ opts_chunk$set(cache     =TRUE,
 iFig=0
 ```
 
-
-```{r, pkgs, message=FALSE}
-library(ggplotFL)
-library(plyr)
-library(reshape)
-library(FLBRP)
-library(FLife)
-```
-
 ```{r, theme, echo=FALSE}
+library(ggplot2)
 theme_set(theme_bw())
 options(digits=3)
 ```
 
-## Install FLR packages
+[Back to Top](#top)
 
-To follow this tutorial you will have to install a number of packages, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
+# Installation
 
-Install FLR from [https://www.flr-project.org/](www.flr-project.org/)
+To run the code in this vignette a number of packages need to be installed, from CRAN and the  
+[FLR](http://www.flr-project.org) website, where  [tutorials](https://www.flr-project.org/doc/) are also available.
+
+
+## Libraries
+
+### CRAN
+
+The example and the `mydas` and `FLife` libraries make extensive use of the packages of [Hadley Wickham](http://hadley.nz/). For example plotting is done using `ggplot2` based on the *Grammar of Graphics* ^[Wilkinson, L. 1999. *The Grammar of Graphics*, Springer. [doi 10.1007/978-3-642-21551-3_13](http://dx.doi.org/10.1007/978-3-642-21551-3_13).]. Grammar is to specifies the individual building blocks and allows them to be combined to create the graphic desired^[<http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html>].
+
+```{r}
+library(ggplot2)
+library(plyr)
+library(reshape)
+```
+
+
+### FLR
+
+The FLR packages can be installed from  [www.flr-project.org](http://www.flr-project.org)
+
 ```{r, eval=FALSE}
 install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
              repos="http://flr-project.org/R")
-```
-
-`devtools` needs to be installed and then loaded so that the `mydas` package can be installed from this GitHub repository.
-
-```{r}
-install.packages("devtools",dependencies=TRUE)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-library(devtools)
-
-devtools::install_github("lauriekell/mydas-pkg")
-```
-
-## Load Libraries
-```{r}
-library(plyr)
-library(reshape)
-library(ggplot2)
 ```
 
 ```{r}
@@ -82,15 +99,298 @@ library(FLCore)
 library(FLasher)
 library(FLBRP)
 library(FLife)
+```
+
+### GitHub and Devtools
+
+The `mydas` package is under development, and for now found in a [GitHub repository](https://github.com/lauriekell/mydas-pkg). 
+It can be installed using the `devtools` package, [RTools](https://cran.r-project.org/bin/windows/Rtools) also needs to be installed, see [guide](https://www.coursera.org/lecture/data-scientists-tools/installing-rtools-ecVeq).
+
+```{r, eval=FALSE}
+install.packages("devtools",dependencies=TRUE)
+```
+
+The `mydas` pakage can then be installed.
+
+```{r, echo=TRUE, eval=FALSE}
+library(devtools)
+
+devtools::install_github("lauriekell/mydas-pkg")
+```
+
+```{r, echo=TRUE}
 library(mydas)
 ```
 
+[Back to Top](#top)
+
+# Example
+
+An example of conditioning an OM using life history parameters is provided for turbot.
+
+## Turbot
+
+Retrieve life history paramters from fishbase, 
 
 ```{r}
+load(url("https://github.com//fishnets//fishnets//blob//master//data//fishbase-web//fishbase-web.RData?raw=True"))
+```
+
+Select turbot
+
+```{r}
+lh=subset(fb,species=="Psetta maxima")
+```
+
+Rename the variables so they are consistent with naming in the `FLife`
+
+```{r}
+names(lh)[c(14,17)] = c("l50","a50")
+lh=lh[,c("linf","k","t0","a","b","a50","l50")]
+
+head(lh)
 ```
 
 
-**Figure `r iFig=iFig+1; iFig`** 
+```{r, fig.height=6, fig.width=6, echo=FALSE}
+library(GGally)
+
+my_smooth <- function(data,mapping,...){
+  ggplot(data=data,mapping=mapping)+
+  geom_point(...,size=.5)+
+  geom_smooth(...,method="lm",se=FALSE)}
+
+my_density <- function(data,mapping,...){
+  ggplot(data=data,mapping=mapping)+
+  geom_density(...,lwd=1)}
+
+ggpairs(transform(lh,linf=log(linf),k=log(k),l50=log(l50)),
+  lower = list(continuous = wrap(my_smooth)),
+  diag=list(continuous=wrap(my_density,alpha=0.2)),
+  title = "")+
+  theme(legend.position ="none",
+  panel.grid.major =element_blank(),
+  axis.ticks       =element_blank(),
+  axis.text.x      =element_blank(),
+  axis.text.y      =element_blank(),
+  panel.border     =element_rect(linetype = 1, colour="black", fill=NA))+
+  theme_bw()
+```
+
+**Figure `r iFig=iFig+1; iFig`** Pairwise scatter plots of turbot life history parameters.
+
+
+The parameters are related, e.g. $L_{\infty}$ and $k$ from the von Bertalannfy growth equation. 
+
+Get the means and create an `FLPar` object
+```{r}
+lh=apply(lh,2,mean,na.rm=T)
+lh=FLPar(lh)
+
+lh
+```
+
+
+```{r, fig.height=8, fig.width=8}
+data("teleost")
+habitat=ifelse(attributes(teleost)$habitat=="demersal","Demersal","Other")
+
+
+ggpairs(cbind(transform(model.frame(teleost)[,-c(7)],linf=log(linf),k=log(k),l50=log(l50)),
+                  "habitat"=habitat),
+  mapping = ggplot2::aes(color=habitat),
+  lower = list(continuous = wrap(my_smooth)),
+  diag=list(continuous=wrap(my_density,alpha=0.2)),
+  title = "")+
+  theme(legend.position ="none",
+  panel.grid.major =element_blank(),
+  axis.ticks       =element_blank(),
+  axis.text.x      =element_blank(),
+  axis.text.y      =element_blank(),
+  panel.border     =element_rect(linetype = 1, colour="black", fill=NA))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Pairwise scatter plots of life history parameters.
+
+Since the parameters are related to each other missing values can be filled in using life history theory. Quantities which can not be infered form life history such as selection-at-age are set using defaults, in this case selection-at-age is assummed to be the same as maturity-at-age, so that quantities such as MSY reference points can be compared across stocks. 
+
+[Back to Top](#top)
+
+
+# Life history relationships
+
+Empirical studies have shown that in teleosts there is significant correlation between the life history parameters  such as age at first reproduction, natural mortality, and growth rate \cite{roff1984evolution}. Additionally, size-spectrum theory and multispecies models suggest that natural mortality scales with body size \cite{andersen2006asymptotic}, \cite{pope2006modelling} \cite{gislason2008coexistence}. This means that from something that is easily observable, like the maximum size, it is possible to infer the life history parameters of species for which data are not easily observable or available.
+
+
+\cite{gislason2008coexistence} summarised life history characteristics and the relationships between them for a range of stocks and species. 
+
+These relationships can be used to parameterise an age-structured population model using relationships that describe growth, maturation and natural mortality.
+
+Create an `FLPar` with $L_{\infty}$
+```{r}
+bigFish=FLPar(linf=100)
+bigFish
+```
+
+Get all the other parameters
+```{r}
+lhPar(bigFish)
+```
+
+### Growth
+Consider the von Bertalanffy growth equation
+
+$$ L_t = L_\infty (1 - e^{(-kt-t_0)})$$
+
+where $L_t$ is length at time t, $L_\infty$ the asymptotic maximum length, $k$ the growth coefficient,  and $t_0$ the time at which an individual would, if it possible, be of zero length. 
+
+As $L_\infty$ increases $k$ declines. in other words at a given length a large species will grow faster than a small species. for example @gislason2008coexistence proposed the relationship 
+
+$$k=3.15L_{\infty}^{-0.64}$$
+
+
+There also appears to be empirical relationship between $t_0$ and $L_{\infty}$ and $k$   i.e.
+
+$$log(-t_0) = -0.3922 - 0.2752 log(L_{\infty}) - 1.038 log(k)$$ 
+
+Therefore for a value of $L_{\infty}$ or even $L_{max}$ the maximum size observered as 
+$L_{\infty}=0.95L_{max}$ then all the growth parameters can be recovered.
+
+### Maturity
+
+There is also a relationship between $L_{50}$ the length at which 50% of individuals are mature
+
+$$l_{50}=0.72L_{\infty}^{0.93}$$
+
+and even between the length weight relationship
+
+$$W=aL^b$$
+
+### Natural Mortality
+
+For larger species securing sufficient food to maintain a fast growth rate may entail exposure to a higher natural mortality @gislason2008does. While many small demersal species seem to be partly protected against predation by hiding, cryptic behaviour, being flat or by possessing spines have the lowest rates of natural mortality @griffiths2007natural. Hence, at a given length individuals belonging to species with a high $L_{\infty}$ may generally be exposed to a higher M than individuals belonging to species with a low $L_{\infty}$.
+
+$$ log(M) = 0.55-1.61log(L) + 1.44log(L_{\infty}) + log(k)$$
+
+### Steepness 
+ 
+Relationship between steepness and $L_{50}/L_{\infty}$
+
+$$logit(\mu)=2.706-3.698\frac{l_{50}}{L_{\infty}}$$
+
+Take the life history parameters and derive steepness, based on $L_{50}$ and $L_{\infty}$
+
+```{r}
+par=lhPar(bigFish)
+par
+```
+
+```{r}
+y=2.706-3.698*par["l50"]/par["linf"]
+
+invLogit<-function(y) 0.2+exp(y)/(1+exp(y))
+
+invLogit(y)
+```
+
+# Equilibrium Dynamics
+
+The parameters are used to model growth, fecundity and natural mortality. The `FLPar` object is first coerced into an [`FLBRP` object](https://www.flr-project.org/doc/Reference_points_for_fisheries_management_with_FLBRP.html) by the `lhEql` method 
+
+```{r}
+eq=lhEql(par)
+```
+
+```{r vectors, echo=FALSE, fig.height=6}
+sel<-function(x) 
+  catch.sel(x)%/%fapex(catch.sel(x))
+
+ggplot(as.data.frame(FLQuants(eq,"m","catch.sel"=sel,"mat","catch.wt")))+
+  geom_line(aes(age,data))+
+  facet_wrap(~qname,scale="free")+
+  scale_x_continuous(limits=c(0,15))+ 
+  guides(colour=guide_legend(title="Species",title.position="top"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
+
+`FLBRP` models the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruitment relationship.
+
+```{r}
+plot(eq,refpts=c("msy","f0.1"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
+
+[Back to Top](#top)
+
+# Time Series Dynamics
+
+To model time series the FLBRP object is then coerced into an `FLStock` object which can then be [projected forward](https://www.flr-project.org/doc/Forecasting_on_the_Medium_Term_for_advice_using_FLasher.html) for assumptions about fishing history and current depletion.
+
+For example to simulate a stock that was originally lightly exploited, effort increases until the stock is overfished at which point fishing pressure is reduced to recover the stock to $B_{MSY}$.
+
+```{r, fbar, fig.height=2}
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out = 30)[-30],
+                                              seq(2,1.0,length.out = 10),
+                                              rep(1.0,61)))[,1:105]
+plot(fbar(eq))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Simulation of a fishing history.
+
+Coerce the `FLBRP` into an `FLStock`
+
+```{r}
+om=as(eq,"FLStock")
+```
+
+Then project for the assumed exploitation history
+
+```{r, om-fwd}
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq)
+```
+
+
+```{r stock-stochastic-2, echo=FALSE}
+plot(om)+
+  geom_line(aes(year,data,col=iter),data=plot(iter(window(om,end=100),1:3))$data)+
+  theme(legend.position="none")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series of F, SSB, recruitment and yield
+
+```{r ts}
+plot(FLQuants(om,   
+          "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
+          "rec" = function(x) rec(x)%/%refpts( eq)["msy","rec"], 
+          "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
+          "catch"=function(x) landings(x)%/%refpts(eq)["msy","yield"])) + 
+  geom_hline(aes(yintercept=1),col="red",linetype=2) 
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series relative to MSY benchmarks.
+
+## Stochasticity 
+
+Include recruitment variability, e.g. for 100 Monte Carlo simulations with a CV of 0.3  
+
+```{r}
+nits=100
+
+srDev=rlnoise(nits, rec(om) %=% 0, 0.3)
+
+om=propagate(om,nits)
+
+om=fwd(om,fbar=fbar(om)[,-1], sr=eq, residuals=srDev)
+```
+
+```{r}
+plot(om, iter=77)
+```
+
+[Back to Top](#top)
 
 ## Software Versions
 
@@ -106,7 +406,9 @@ library(mydas)
 
 ## Acknowledgements
 
-
 # References {#References}
+
+[Back to Top](#top)
+
 
 
